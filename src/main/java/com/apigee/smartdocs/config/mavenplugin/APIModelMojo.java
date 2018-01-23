@@ -178,6 +178,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
   /**
    * Posts an update based on available OpenAPI specs. Will update base
    * information, then upload the current OpenAPI spec.
+   * @throws MojoExecutionException
    */
   public void doUpdate() throws MojoExecutionException {
     try {
@@ -193,6 +194,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
   
   /**
    * Sends a render request for models that exist in the file system.
+   * @throws MojoExecutionException
    */
   public void doRender() throws MojoExecutionException {
     try {
@@ -208,6 +210,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
   
   /**
    * Deletes models that exist in the API and not in the file system.
+   * @throws MojoExecutionException
    */
   public void doDelete() throws MojoExecutionException {
     try {
@@ -238,6 +241,8 @@ public class APIModelMojo extends GatewayAbstractMojo {
   /**
    * Pulls a list of OpenAPI specs frpm a directory to be sent 
    * to a Developer Portal instance.
+   * 
+   * @throws MojoExecutionException
    */
   public void getOpenAPISpecs() throws MojoExecutionException {
     // Ensure we have a directory to read.
