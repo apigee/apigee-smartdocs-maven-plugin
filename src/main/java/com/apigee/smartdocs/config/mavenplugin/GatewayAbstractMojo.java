@@ -144,6 +144,13 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
   private Map<String, PortalField> portalModelFields;
 
   /**
+   * Portal Cron Key
+   *
+   * @parameter property="portal.cronkey"
+   */
+  private String portalCronKey;
+  
+  /**
    * Skip running this plugin. Default is false.
    *   
 * @parameter default-value="false"
@@ -167,6 +174,7 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
     this.buildProfile.setPortalFormat(this.portalFormat);
     this.buildProfile.setPortalModelFields(this.portalModelFields);
     this.buildProfile.setPortalModelVocabulary(this.portalModelVocabulary);
+    this.buildProfile.setPortalCronKey(this.portalCronKey);
 
     return buildProfile;
   }

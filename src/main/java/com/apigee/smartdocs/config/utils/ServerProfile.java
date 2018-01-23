@@ -30,6 +30,7 @@ public class ServerProfile {
   private String portalPath; // Developer Portal REST base path
   private String portalFormat; // OpenAPI spec format
   private String portalModelVocabulary; // Model Vocabulary
+  private String portalCronKey; // Dev portal Cron Key
   private Map<String, PortalField> portalModelFields; // OpenAPI spec format
 
   /**
@@ -124,10 +125,24 @@ public class ServerProfile {
   }
 
   /**
-   * @return the portalModelFields
+   * @return the portalModelVocabulary
    */
   public String getPortalModelVocabulary() {
     return portalModelVocabulary;
+  }
+  
+  /**
+   * @param portalCronKey the portalCronKey to set
+   */
+  public void setPortalCronKey(String portalCronKey) {
+    this.portalCronKey = portalCronKey;
+  }
+
+  /**
+   * @return the portalCronKey
+   */
+  public String getPortalCronKey() {
+    return portalCronKey;
   }
 
   /**

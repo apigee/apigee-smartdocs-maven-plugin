@@ -18,11 +18,11 @@
             <properties>
                 <portal.username>${pusername}</portal.username><!-- Username for the developer portal. -->
                 <portal.password>${ppassword}</portal.password><!-- Password for the developer portal. -->
-                <portal.directory>${pdirectory}</portal.directory><!-- Directory whered OpenAPI specs are accessible. -->
+                <portal.directory>./specs</portal.directory><!-- Directory where OpenAPI specs are accessible. Using ./specs for sample-->
                 <portal.url>${purl}</portal.url><!-- URL of the developer portal. -->
                 <portal.path>${ppath}</portal.path><!-- Servies path defined in the developer portal. -->
-                <portal.format>json</portal.format><!-- Format of the OpenAPI specs. -->
-
+                <portal.cronkey>${pcronkey}</portal.cronkey> <!-- Developer Portal Cron Key, you can get it from Home -> Administration -> Configuration -> System -->
+                <portal.format>yaml</portal.format><!-- Format of the OpenAPI specs. json|yaml -->
             </properties>
         </profile>
     </profiles>

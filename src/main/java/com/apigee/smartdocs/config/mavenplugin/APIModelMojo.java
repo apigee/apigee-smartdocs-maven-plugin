@@ -202,6 +202,12 @@ public class APIModelMojo extends GatewayAbstractMojo {
         PortalRestUtil.renderAPIModel(serverProfile, file);
       }
       logger.info("Rendered all models found in the OpenAPI Spec directory.");
+      if(serverProfile!=null && serverProfile.getPortalCronKey()!=null && !serverProfile.getPortalCronKey().equals("")){
+    	  PortalRestUtil.runCron(serverProfile);
+          logger.info("Cron job run complete");
+      }else{
+    	  logger.info("Cron job is not run, please run cron to see the rendered nodes");
+      }
     }
     catch (IOException e) {
       throw new RuntimeException("Render failure: " + e.getMessage());

@@ -388,6 +388,26 @@ public class PortalRestUtil {
   }
 
   /**
+   * Run Cron
+   */
+  public static void runCron(ServerProfile profile) throws IOException {
+    HttpResponse response = null;
+    try {
+      // First authenticate.
+      authenticate(profile);
+
+      HttpRequest restRequest = REQUEST_FACTORY
+              .buildGetRequest(new GenericUrl(profile.getPortalURL() + "/cron.php?cron_key="+ profile.getPortalCronKey()));
+      restRequest.setReadTimeout(0);
+      logger.info("Running Cron");
+
+      response = PortalRestUtil.executeRequest(restRequest);
+    } catch (HttpResponseException e) {
+      throw e;
+    }
+  }
+  
+  /**
    * Helper function to build the body for model creations and updates.
    */
   private static ByteArrayContent getAPIModelContent(ServerProfile profile,
@@ -421,7 +441,7 @@ public class PortalRestUtil {
    * Posts the OpenAPI Spec to a APIModel in Developer Portal.
    */
   public static void postAPIModel(ServerProfile profile, File file) throws IOException {
-    HttpResponse response = null;
+	  HttpResponse response = null;
     try {
       // First authenticate.
       authenticate(profile);
