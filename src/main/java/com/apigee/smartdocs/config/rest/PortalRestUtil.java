@@ -235,7 +235,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildGetRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs.json"));
+                              + "/models"));
       logger.info("Retrieving all models.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -273,7 +273,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildGetRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + ".json"));
+                              + "/models/" + spec.getName()));
       logger.info("Retrieve " + spec.getTitle() + " model.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -308,7 +308,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPostRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs.json"), content);
+                              + "/models"), content);
       logger.info("Creating " + spec.getTitle() + " model.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -333,7 +333,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPutRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + ".json"), content);
+                              + "/models/" + spec.getName() + ".json"), content);
       logger.info("Updating " + spec.getTitle() + " model.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -354,7 +354,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildDeleteRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + specName + ".json"));
+                              + "/models/" + specName));
       logger.info("Deleting " + specName + " model.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -378,7 +378,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPostRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + "/render.json"), content);
+                              + "/models/" + spec.getName() + "/render"), content);
       logger.info("Rendering " + spec.getTitle() + " OpenAPI spec.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -496,7 +496,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPostRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + "/import.json"), content);
+                              + "/models/" + spec.getName() + "/import"), content);
       logger.info("Posting " + spec.getTitle() + " OpenAPI spec.");
 
       response = PortalRestUtil.executeRequest(restRequest);
