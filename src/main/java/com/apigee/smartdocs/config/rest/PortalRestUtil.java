@@ -145,6 +145,7 @@ public class PortalRestUtil {
     public String vid;
     public String name;
     public String description;
+    public String uuid;
   }
 
   /**
@@ -613,6 +614,7 @@ public class PortalRestUtil {
       String tid = hs.remove("tid").toString();
       String vid = hs.remove("vid").toString();
       String name = hs.remove("name").toString();
+      String uuid = hs.remove("uuid").toString();
       Iterator it = hs.entrySet().iterator();
       String updateFields = "";
       while (it.hasNext()) {
@@ -621,6 +623,8 @@ public class PortalRestUtil {
       }
       ByteArrayContent content = new ByteArrayContent("application/json",
               ("{"
+              + "\"uuid\": \"" + uuid + "\","
+              + "\"vocabulary_machine_name\": \"" + profile.getPortalModelVocabulary() + "\","
               + "\"tid\": \"" + tid + "\","
               + "\"vid\": \"" + vid + "\","
               + "\"name\": \"" + name + "\""
@@ -630,7 +634,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPutRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/taxonomy_term/" + tid + ".json"), content);
+                              + "/taxonomy_term/" + uuid + ".json"), content);
 
       logger.info("Updating taxonomy term with tid " + tid + ".");
       response = PortalRestUtil.executeRequest(restRequest);
