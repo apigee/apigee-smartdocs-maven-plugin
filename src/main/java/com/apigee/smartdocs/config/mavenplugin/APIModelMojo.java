@@ -312,6 +312,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
                 hs.put("tid", to.tid);
                 hs.put("vid", to.vid);
                 hs.put("name", to.name);
+                hs.put("uuid", to.uuid);
                 PortalRestUtil.updateTaxonomyTerm(serverProfile, hs);
               }
               // Remove our matched term so we don't have to check it again.
