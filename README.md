@@ -29,7 +29,8 @@ mvn install -Pdev -Dapigee.smartdocs.config.options=create
     none   - No action (default)
     create - Creates the model found in the OpenAPI Spec directory
     update - Updates the model found in the OpenAPI Spec directory
-    delete - Deleted all models not found in the OpenAPI Spec directory
+    delete - Deletes all models not found in the OpenAPI Spec directory
+    deleteAPIModel - Deletes all models from dev portal found in the OpenAPI Spec directory
     render - Renders the smart docs 
     sync   - executes the delete option (mentioned above) and recreates the models found in the OpenAPI Spec directory. This also renders the smart docs as well
     

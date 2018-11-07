@@ -16,27 +16,26 @@
 
 package com.apigee.smartdocs.config.mavenplugin;
 
-import com.apigee.smartdocs.config.rest.PortalRestUtil;
-import com.apigee.smartdocs.config.utils.ServerProfile;
-import com.apigee.smartdocs.config.utils.PortalField;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.apigee.smartdocs.config.rest.PortalRestUtil;
+import com.apigee.smartdocs.config.utils.PortalField;
+import com.apigee.smartdocs.config.utils.ServerProfile;
 import com.google.api.client.util.Key;
-
-import java.io.IOException;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.google.gson.internal.LinkedTreeMap;
-import java.util.Collection;
-import java.util.HashMap;
 
 /**                                                                                                                                     ¡¡
  * Goal to create API Models in Apigee Developer Portal
@@ -55,7 +54,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
   "************************************************************************";
 
   enum OPTIONS {
-    none, create, update, delete, sync, render
+    none, create, update, delete, deleteAPIModel, sync, render
   }
 
   OPTIONS buildOption = OPTIONS.none;
@@ -157,6 +156,10 @@ public class APIModelMojo extends GatewayAbstractMojo {
         doDelete();
       }
       
+      if (buildOption == OPTIONS.deleteAPIModel) {
+    	  doDeleteAPIModel();
+        }
+      
       if (buildOption == OPTIONS.render) {
         doRender();
       }
@@ -202,16 +205,28 @@ public class APIModelMojo extends GatewayAbstractMojo {
         PortalRestUtil.renderAPIModel(serverProfile, file);
       }
       logger.info("Rendered all models found in the OpenAPI Spec directory.");
-      if(serverProfile!=null && serverProfile.getPortalCronKey()!=null && !serverProfile.getPortalCronKey().equals("")){
-    	  PortalRestUtil.runCron(serverProfile);
-          logger.info("Cron job run complete");
-      }else{
-    	  logger.info("Cron job is not run, please run cron to see the rendered nodes");
-      }
+      doCron();
     }
     catch (IOException e) {
       throw new RuntimeException("Render failure: " + e.getMessage());
     }
+  }
+  
+  /**
+   * Run Cron
+   */
+  public void doCron() throws MojoExecutionException {
+	  try {
+		  if(serverProfile!=null && serverProfile.getPortalCronKey()!=null && !serverProfile.getPortalCronKey().equals("")){
+	    	  PortalRestUtil.runCron(serverProfile);
+	          logger.info("Cron job run complete");
+	      }else{
+	    	  logger.info("Cron job is not run, please run cron to see the rendered nodes");
+	      }
+	  	}
+	  catch (IOException e) {
+	      throw new RuntimeException("Cron failure: " + e.getMessage());
+	  	}
   }
   
   /**
@@ -238,6 +253,37 @@ public class APIModelMojo extends GatewayAbstractMojo {
         }
       }
       logger.info("Deleted all models not found in the OpenAPI Spec directory.");
+    }
+    catch (IOException e) {
+      throw new RuntimeException("Deletion failure: " + e.getMessage());
+    }
+  }
+  
+  /**
+   * Deletes the APIModel from dev portal
+   * @throws MojoExecutionException
+   */
+  public void doDeleteAPIModel() throws MojoExecutionException {
+    try {
+      // Create a list of all specs we have on the file system.
+      Set<String> specNames = new HashSet<String>();
+      if (files != null && files.length > 0) {
+        for (File file : files) {
+          logger.info("FilePath: " + file.getPath());
+          PortalRestUtil.SpecObject spec = PortalRestUtil.parseSpec(serverProfile, file);
+          specNames.add(spec.getName());
+        }
+      }
+
+      // Iterate over all models and if exist on the file system, delete it.
+      PortalRestUtil.ModelObjects modelObjectArray = PortalRestUtil.getAPIModels(serverProfile);
+      for (PortalRestUtil.ModelObject mo : modelObjectArray.modelObjects) {
+        if (specNames.contains(mo.name)) {
+          PortalRestUtil.deleteAPIModel(serverProfile, mo.name);
+        }
+      }
+      logger.info("Deleted all models not found in the OpenAPI Spec directory.");
+      doCron();
     }
     catch (IOException e) {
       throw new RuntimeException("Deletion failure: " + e.getMessage());
