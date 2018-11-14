@@ -31,6 +31,7 @@ public class ServerProfile {
   private String portalFormat; // OpenAPI spec format
   private String portalModelVocabulary; // Model Vocabulary
   private String portalCronKey; // Dev portal Cron Key
+  private String portalModelNameConfig; // OPTIONAL configuration for Model Name
   private Map<String, PortalField> portalModelFields; // OpenAPI spec format
 
   /**
@@ -130,7 +131,7 @@ public class ServerProfile {
   public String getPortalModelVocabulary() {
     return portalModelVocabulary;
   }
-  
+
   /**
    * @param portalCronKey the portalCronKey to set
    */
@@ -170,4 +171,17 @@ public class ServerProfile {
     this.options = options;
   }
 
+  /**
+   * @return the PortalModelNameConfig
+   */
+  public String getPortalModelNameConfig() {
+    return portalModelNameConfig;
+  }
+
+  /**
+   * @param portalModelNameConfig the portalModelNameConfig to set
+   */
+  public void setPortalModelNameConfig(String portalModelNameConfig) {
+    this.portalModelNameConfig = portalModelNameConfig;
+  }
 }

@@ -33,6 +33,10 @@
                       path represents the signifies the path to data stored within the info object. 
                         The pipe character can be used to traverse into sub-items. For instance, with a OpenAPI document containing  { "info": { "contact": { "company": "Google" } } }, you could be access the data by setting the path to contact|company.
                       field represents the machine name of the field within the Developer portal.
+
+                      portal.model.config.name can be used to configure the modelName being sent to the SmartDocs API
+                        The caret symbol (^) is used to seperate which fields you want appended to the title from the info object and it will be replaced with _
+                        The pipe character is used to traverse into sub-items if necessary
                 -->
                 <!--
                 <configuration>
@@ -47,6 +51,7 @@
                             <field>field_approval_type</field>
                         </approval-type>
                     </portal.model.fields>
+                    <portal.model.config.name>contact|x-country^title</portal.model.config.name>
                 </configuration>
                 -->
                 <executions>

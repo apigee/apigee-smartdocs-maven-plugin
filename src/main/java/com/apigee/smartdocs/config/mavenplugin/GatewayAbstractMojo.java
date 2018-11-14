@@ -149,10 +149,17 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
    * @parameter property="portal.cronkey"
    */
   private String portalCronKey;
-  
+
+  /**
+   * Portal Model Name Config
+   *
+   * @parameter alias="portal.model.config.name"
+   */
+  private String portalModelNameConfig;
+
   /**
    * Skip running this plugin. Default is false.
-   *   
+   *
 * @parameter default-value="false"
    */
   private boolean skip = false;
@@ -175,6 +182,7 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
     this.buildProfile.setPortalModelFields(this.portalModelFields);
     this.buildProfile.setPortalModelVocabulary(this.portalModelVocabulary);
     this.buildProfile.setPortalCronKey(this.portalCronKey);
+    this.buildProfile.setPortalModelNameConfig(this.portalModelNameConfig);
 
     return buildProfile;
   }
