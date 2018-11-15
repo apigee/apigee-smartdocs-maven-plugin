@@ -106,6 +106,30 @@ To run jump to samples project `cd /samples/DevPortal` and run
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create`
 
+#### Configuring the model name on the Developer Portal
+
+If you would like to configure the model name of the SmartDoc on the developer portal, you can use additional fields from the OpenAPI specification. The default model name is based on the title.
+
+ In order to configure it to generate a unique model name, you will need to specify the format in the shared-pom.xml
+ 
+     <configuration>
+        ...
+        <portal.model.config.name>contact|x-country^title</portal.model.config.name>
+        ...
+    </configuration>
+    
+The example config above would generate a model name based on the info object OpenAPI document. For instance, an OpenAPI document containing:
+```json
+{
+  "info": {
+    "title": "Hello World API",
+    "contact": {
+      "x-country": "Canada"
+    }
+  }
+}
+```
+The model name would be `Canada_Hello-World-API`
 
 ### Troubleshooting
 
