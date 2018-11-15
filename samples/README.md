@@ -106,7 +106,9 @@ To run jump to samples project `cd /samples/DevPortal` and run
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create`
 
-#### Configuring the model name on the Developer Portal
+#### Configuring the model name on the Developer Portal (Optional)
+
+The default model name without this configuration is the title field from the info object.
 
 If you would like to configure the model name of the SmartDoc on the developer portal, you can use additional fields from the OpenAPI specification. The default model name is based on the title.
 
@@ -117,6 +119,8 @@ If you would like to configure the model name of the SmartDoc on the developer p
         <portal.model.config.name>contact|x-country^title</portal.model.config.name>
         ...
     </configuration>
+
+ The caret symbol (^) is used to separate which fields you want extracted from the info object and it will be replaced with underscore (_) in the name
     
 The example config above would generate a model name based on the info object OpenAPI document. For instance, an OpenAPI document containing:
 ```json
