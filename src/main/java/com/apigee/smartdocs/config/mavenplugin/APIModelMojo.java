@@ -241,7 +241,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
         for (File file : files) {
           logger.info("FilePath: " + file.getPath());
           PortalRestUtil.SpecObject spec = PortalRestUtil.parseSpec(serverProfile, file);
-          specNames.add(spec.getName());
+          specNames.add(spec.getName(serverProfile.getPortalModelNameConfig()));
         }
       }
 
@@ -271,7 +271,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
         for (File file : files) {
           logger.info("FilePath: " + file.getPath());
           PortalRestUtil.SpecObject spec = PortalRestUtil.parseSpec(serverProfile, file);
-          specNames.add(spec.getName());
+          specNames.add(spec.getName(serverProfile.getPortalModelNameConfig()));
         }
       }
 
@@ -325,7 +325,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
           logger.info("Pushing fields for " + spec.getTitle());
           for (PortalRestUtil.TaxonomyTermObject to: tos) {
             // Match file and taxonomy term.
-            if (to.name.equals(spec.getName())) {
+            if (to.name.equals(spec.getName(serverProfile.getPortalModelNameConfig()))) {
               HashMap hs = new HashMap();
               for (PortalField pf : modelFields.values()) {
                 // Elements can be embedded within the info object, so

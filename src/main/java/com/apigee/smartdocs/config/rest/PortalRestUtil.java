@@ -93,8 +93,57 @@ public class PortalRestUtil {
 
     public LinkedTreeMap info;
 
-    public String getName() {
-      return info.get("title").toString().replace(" ", "-");
+    public String getName(String portalModelNameConfig) {
+      if(portalModelNameConfig == null) {
+        return info.get("title").toString().replace(" ", "-");
+      } else {
+        return getConfigModelName(portalModelNameConfig);
+      }
+    }
+
+    private String getConfigModelName(String portalModelNameConfig) {
+      //default return
+      String returnString = getName(null);
+      if(portalModelNameConfig == null) {
+        return returnString;
+      }
+      //Generate Model Name From Config
+      ArrayList<String> al = new ArrayList<String>();
+      String[] nameParts = portalModelNameConfig.split("\\^");
+      LinkedTreeMap jo = info;
+      for (String namePart : nameParts) {
+        //Reset head of tree to info
+        jo = info;
+        //Split each config name into model information
+        String[] namePartPaths = namePart.split("\\|");
+        for (String namePartPath : namePartPaths) {
+          // Only traverse down if the key exists.
+          if (jo.containsKey(namePartPath)) {
+            Object o = jo.get(namePartPath);
+            // If we still need to go deeper, we have a tree.
+            if (o instanceof LinkedTreeMap) {
+              jo = (LinkedTreeMap) o;
+            } else {
+              // Otherwise, store the value in our ArrayList
+              al.add(o.toString().replace(".", "-").replace(" ","-"));
+            }
+          }
+        }
+      }
+      if(al.isEmpty()) {
+        return returnString;
+      }
+      returnString = "";
+      Iterator it = al.iterator();
+      while (it.hasNext()) {
+        String namePart = (String) it.next();
+        returnString += namePart;
+        //Seperate fields with underscore
+        if(it.hasNext()) {
+            returnString += "_";
+        }
+      }
+      return returnString;
     }
 
     public String getTitle() {
@@ -110,7 +159,7 @@ public class PortalRestUtil {
     
     @Override
     public String toString() {
-      return "(SpecObject) Name: " + getName() + "; Title: " + getTitle(); 
+      return "(SpecObject) Name: " + getName(null) + "; Title: " + getTitle();
     }
   }
 
@@ -274,7 +323,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildGetRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + ".json"));
+                              + "/smartdocs/" + spec.getName(profile.getPortalModelNameConfig()) + ".json"));
       logger.info("Retrieve " + spec.getTitle() + " model.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -334,7 +383,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPutRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + ".json"), content);
+                              + "/smartdocs/" + spec.getName(profile.getPortalModelNameConfig()) + ".json"), content);
       logger.info("Updating " + spec.getTitle() + " model.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -379,7 +428,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPostRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + "/render.json"), content);
+                              + "/smartdocs/" + spec.getName(profile.getPortalModelNameConfig()) + "/render.json"), content);
       logger.info("Rendering " + spec.getTitle() + " OpenAPI spec.");
 
       response = PortalRestUtil.executeRequest(restRequest);
@@ -425,7 +474,7 @@ public class PortalRestUtil {
       }
 
       String payload = "{"
-              + "\"name\": \"" + spec.getName() + "\","
+              + "\"name\": \"" + spec.getName(profile.getPortalModelNameConfig()) + "\","
               + "\"display_name\":\"" + spec.getTitle() + "\","
               + "\"description\":\"" + description + "\""
               + "}";
@@ -497,7 +546,7 @@ public class PortalRestUtil {
       HttpRequest restRequest = REQUEST_FACTORY
               .buildPostRequest(new GenericUrl(
                               profile.getPortalURL() + "/" + profile.getPortalPath()
-                              + "/smartdocs/" + spec.getName() + "/import.json"), content);
+                              + "/smartdocs/" + spec.getName(profile.getPortalModelNameConfig()) + "/import.json"), content);
       logger.info("Posting " + spec.getTitle() + " OpenAPI spec.");
 
       response = PortalRestUtil.executeRequest(restRequest);
