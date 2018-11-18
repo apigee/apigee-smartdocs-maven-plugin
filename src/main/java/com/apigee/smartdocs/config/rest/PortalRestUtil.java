@@ -53,6 +53,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.simple.JSONValue;
 import org.yaml.snakeyaml.Yaml;
 
@@ -470,7 +472,7 @@ public class PortalRestUtil {
 
       String description = "";
       if (spec.getDescription() != null) {
-        description = spec.getDescription();
+        description = StringEscapeUtils.escapeJava(spec.getDescription());
       }
 
       String payload = "{"

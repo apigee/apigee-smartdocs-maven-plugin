@@ -177,6 +177,11 @@
       <version>3.1.0</version>
   </dependency>
        <!-- mgmt-api-java-sdk -->
+  <dependency>
+  	<groupId>org.apache.commons</groupId>
+  	<artifactId>commons-text</artifactId>
+  	<version>1.2</version>
+  </dependency>
   </dependencies>
 
   <build>
