@@ -145,6 +145,13 @@ public class PortalRestUtil {
             returnString += "_";
         }
       }
+      //Clean the return string to only include Alphanumeric characters, underscore and dash
+      returnString = returnString.replaceAll("[^A-Za-z0-9_-]","");
+      //set Max length to be 255
+      if(returnString.length() > 255) {
+        returnString = returnString.substring(0,255);
+      }
+      logger.debug("API Model Name: " + returnString);
       return returnString;
     }
 
