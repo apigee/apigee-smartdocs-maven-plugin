@@ -1,15 +1,3 @@
-# Samples
-
-## Prerequisites (Developer Portal setup)
-
-- This sample is for **Drupal 7 version of Developer portal**. The version of the plugin used in the pom **should be 1.x**
-- If you are using Drupal 8 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal8)
-- To utilize this example, you will need a working developer portal instance with the [smartdocs_service module](https://github.com/apigeecs/smartdocs_service) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin. For advanced configuration/setup please consult an expert. See [here](https://www.drupal.org/docs/7/extending-drupal-7/installing-drupal-7-contributed-modules#import_mod--manual) for more information on installing modules into the Developer Portal. **
-
-When the module has been installed in the codebase, go to http://[yoursite.com]/admin/modules, select the smartdocs_service module and click "Save configuration". This will enable your module. 
-
-When smartdocs_service module is installed and enabled, you should see 1 available service labeled smartdocs_service on the page located at http://[yoursite.com]/admin/structure/services.
-
 ------------
 Plugin Usage
 ------------
@@ -34,6 +22,18 @@ mvn install -Pdev -Dapigee.smartdocs.config.options=create
    If you use create or update option, you will need to run the command again with option as render
 ```
 
+
+# Samples
+
+## Prerequisites (Developer Portal setup)
+
+- This sample is for **Drupal 7 version of Developer portal**. The version of the plugin used in the pom **should be 1.x**
+- If you are using Drupal 8 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal8)
+- To utilize this example, you will need a working developer portal instance with the [smartdocs_service module](https://github.com/apigeecs/smartdocs_service) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin. For advanced configuration/setup please consult an expert. See [here](https://www.drupal.org/docs/7/extending-drupal-7/installing-drupal-7-contributed-modules#import_mod--manual) for more information on installing modules into the Developer Portal. **
+
+When the module has been installed in the codebase, go to http://[yoursite.com]/admin/modules, select the smartdocs_service module and click "Save configuration". This will enable your module. 
+
+When smartdocs_service module is installed and enabled, you should see 1 available service labeled smartdocs_service on the page located at http://[yoursite.com]/admin/structure/services.
 
 ### Service Listing
 ![](images/Service-Listing.png)
