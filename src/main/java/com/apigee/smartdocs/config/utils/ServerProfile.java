@@ -32,6 +32,7 @@ public class ServerProfile {
   private String portalModelVocabulary; // Model Vocabulary
   private String portalCronKey; // Dev portal Cron Key
   private String portalModelNameConfig; // OPTIONAL configuration for Model Name
+  private String portalAPIDocFormat; // Dev Portal API Doc Format
   private Map<String, PortalField> portalModelFields; // OpenAPI spec format
 
   /**
@@ -184,4 +185,18 @@ public class ServerProfile {
   public void setPortalModelNameConfig(String portalModelNameConfig) {
     this.portalModelNameConfig = portalModelNameConfig;
   }
+
+	/**
+	 * @return the portalAPIDocFormat
+	 */
+	public String getPortalAPIDocFormat() {
+		return portalAPIDocFormat;
+	}
+	
+	/**
+	 * @param portalAPIDocFormat the portalAPIDocFormat to set
+	 */
+	public void setPortalAPIDocFormat(String portalAPIDocFormat) {
+		this.portalAPIDocFormat = portalAPIDocFormat;
+	}
 }
