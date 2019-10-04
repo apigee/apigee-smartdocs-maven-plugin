@@ -156,6 +156,13 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
    * @parameter alias="portal.model.config.name"
    */
   private String portalModelNameConfig;
+  
+  /**
+   * Portal API Doc Format
+   *
+   * @parameter property="portal.api.doc.format"
+   */
+  private String portalAPIDocFormat;
 
   /**
    * Skip running this plugin. Default is false.
@@ -183,7 +190,7 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
     this.buildProfile.setPortalModelVocabulary(this.portalModelVocabulary);
     this.buildProfile.setPortalCronKey(this.portalCronKey);
     this.buildProfile.setPortalModelNameConfig(this.portalModelNameConfig);
-
+    this.buildProfile.setPortalAPIDocFormat(this.portalAPIDocFormat);
     return buildProfile;
   }
 

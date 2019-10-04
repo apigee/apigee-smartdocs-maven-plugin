@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+            <groupId>apigee</groupId>
+            <artifactId>parent-pom</artifactId>
+            <version>1.0</version>
+            <relativePath>shared-pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>Apigee</groupId>
+    <artifactId>DeveloperPortal</artifactId>
+    <version>1.0</version>
+    <name>DeveloperPortal</name>
+    <packaging>pom</packaging>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+            	<portal.url>${purl}</portal.url><!-- URL of the developer portal. -->
+                <portal.username>${pusername}</portal.username><!-- Username for the developer portal. -->
+                <portal.password>${ppassword}</portal.password><!-- Password for the developer portal. -->
+                <portal.format>yaml</portal.format><!-- Format of the OpenAPI specs. json|yaml -->
+                <portal.api.doc.format>basic_html</portal.api.doc.format><!-- Format in the portal. Values: basic_html, restricted_html, full_html -->
+                <portal.directory>./specs</portal.directory> <!-- Directory where OpenAPI specs are accessible. Using ./specs for sample -->
+            </properties>
+        </profile>
+    </profiles>
+</project>

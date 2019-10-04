@@ -16,23 +16,47 @@
 
 package com.apigee.smartdocs.config.rest;
 
-import com.apigee.smartdocs.config.utils.ServerProfile;
 import java.io.File;
-import java.io.Reader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import org.apache.commons.text.StringEscapeUtils;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 
-import com.google.api.client.http.*;
+import com.apigee.smartdocs.config.utils.ServerProfile;
+import com.google.api.client.http.ByteArrayContent;
+import com.google.api.client.http.FileContent;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpMediaType;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.MultipartContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson.JacksonFactory;
-
 import com.google.api.client.util.Key;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -43,20 +67,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
-import java.io.FileNotFoundException;
-import java.io.StringReader;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.text.StringEscapeUtils;
-import org.json.simple.JSONValue;
-import org.yaml.snakeyaml.Yaml;
 
 public class PortalRestUtil {
 
@@ -204,6 +214,64 @@ public class PortalRestUtil {
     public String name;
     public String description;
     public String uuid;
+  }
+  
+  public static class APIDocResponseObject {
+
+	    public JSONAPI jsonapi;
+	    public List<Data> data;
+	    public Object links;
+  }
+  
+  public static class APIDocObject {
+	    public JSONAPI jsonapi;
+	    public Data data;
+	    public Object links;
+}
+  
+  public static class JSONAPI {
+	  public String version;
+	  public Object meta;
+  }
+  
+  public static class Data {
+	  public String type;
+	  public String id;
+	  public Attributes attributes;
+	  public Relationships relationships;
+	  public Object links;
+  }
+  
+  public static class Attributes {
+	  public boolean status;
+	  public String name;
+	  public Description description;
+	  public String spec_file_source;
+	  public Object relationships;
+	  public FileLink file_link;
+	  public Object links;
+  }
+  
+  public static class Description{
+	  public String value;
+	  public String format;
+  }
+  
+  public static class Relationships{
+	  public Relationships_Spec spec;
+  }
+  
+  public static class Relationships_Data{
+	  public String type;
+	  public String id;
+  }
+  
+  public static class Relationships_Spec{
+	  public Relationships_Data data;
+  }
+  
+  public static class FileLink{
+	  public String uri;
   }
 
   /**
@@ -495,6 +563,44 @@ public class PortalRestUtil {
       throw e;
     }
   }
+  
+  /**
+   * Helper function to build the body for API Doc creations and updates.
+   */
+  private static ByteArrayContent getAPIDocContent(ServerProfile profile, SpecObject spec, String uuid) throws IOException {
+	  APIDocObject doc = new APIDocObject();
+	  Data data = new Data();
+	  Attributes attributes = new Attributes();
+	  Description description = new Description();
+	  Relationships relationships = new Relationships();
+	  Relationships_Data relationships_data = new Relationships_Data();
+	  Relationships_Spec relationships_spec = new Relationships_Spec();
+	  data.type = "apidoc--apidoc";
+
+	  attributes.status = true;
+	  attributes.name = spec.getTitle();
+	  if (spec.getDescription() != null) {
+		  description.value = StringEscapeUtils.escapeJava(spec.getDescription());
+	  }
+	  description.format = profile.getPortalAPIDocFormat();
+	  attributes.description = description; 
+	  attributes.spec_file_source = "file";
+	  data.attributes = attributes;
+
+	  relationships_data.id = uuid;
+	  relationships_data.type = "file--file";
+	  relationships_spec.data = relationships_data;
+	  relationships.spec = relationships_spec;
+	  data.relationships = relationships;
+	  
+	  doc.data = data;
+	  
+	  Gson gson = new Gson();
+	  String payload = gson.toJson(doc);
+	  logger.debug("Request payload: \n" + payload);
+	  ByteArrayContent content = new ByteArrayContent("application/vnd.api+json", payload.getBytes());
+	  return content;
+  }
 
   /**
    * Posts the OpenAPI Spec to a APIModel in Developer Portal.
@@ -566,6 +672,174 @@ public class PortalRestUtil {
       throw e;
     }
   }
+  
+  /**
+   * Posts the OpenAPI Spec to a APIDoc in Developer Portal.
+   */
+  public static void postAPIDoc(ServerProfile profile, File file) throws IOException {
+    try {
+      APIDocResponseObject respObj = getAPIDoc(profile, file);
+      if (respObj == null) {
+    	  APIDocObject obj = importAPIDoc(profile, file);
+    	  if(obj == null)
+    		  throw new IOException("Error occured while importing spec");
+    	  else
+    		  createAPIDoc(profile, file, obj);
+      } else {
+        updateAPIDoc(profile, file, respObj);
+      }
+    } catch (HttpResponseException e) {
+      logger.error(e.getMessage());
+      throw e;
+    }
+  }
+  
+  
+  /**
+   * Retrieve an existing API Doc. Returns null if the doc does not exist
+   */
+  public static APIDocResponseObject getAPIDoc(ServerProfile profile, File file) throws IOException {
+    HttpResponse response = null;
+    try {
+	      SpecObject spec = parseSpec(profile, file);  
+	      logger.info("Getting API doc for "+ spec.getTitle());
+	      HttpRequest restRequest = REQUEST_FACTORY
+	              .buildGetRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc?filter[name]=" + spec.getTitle()));
+	      HttpHeaders headers = restRequest.getHeaders();
+	      headers.setAccept("application/vnd.api+json");
+	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+	      logger.info("Retrieving " + spec.getTitle() + " doc.");
+	      restRequest.setReadTimeout(0);
+	      response = restRequest.execute();
+	      Gson gson = new Gson();
+	      Reader reader = new InputStreamReader(response.getContent());
+	      APIDocResponseObject model = gson.fromJson(reader, APIDocResponseObject.class);
+	      if(model != null && model.data!=null && model.data.size()>0) {
+	    	  logger.info("API Doc uuid:" + model.data.get(0).id);
+		      return model;
+	      } else {
+	    	  logger.info("API Doc: "+ spec.getTitle()+" does not exist");
+	    	  return null;
+	      }
+	      
+    } catch (HttpResponseException e) {
+    	throw e;
+    }
+  }
+  
+  /**
+   * Import an API Doc
+   */
+  public static APIDocObject importAPIDoc(ServerProfile profile, File file) throws IOException {
+    HttpResponse response = null;
+    try {
+	      SpecObject spec = parseSpec(profile, file);  
+	      
+	      logger.info("Importing spec..");
+	      byte[] fileBytes = Files.readAllBytes(file.toPath());
+		  ByteArrayContent fileContent = new ByteArrayContent("application/octet-stream", fileBytes);
+		  HttpRequest restRequest = REQUEST_FACTORY
+	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc/spec"), fileContent);
+		  HttpHeaders headers = restRequest.getHeaders();
+		  headers.setAccept("application/vnd.api+json");
+		  headers.set("Content-Disposition", "file; filename=\""+spec.getTitle()+"."+profile.getPortalFormat()+"\"");
+	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+	      restRequest.setReadTimeout(0);
+	      response = restRequest.execute();
+		  logger.info("Spec import complete..");
+	      Gson gson = new Gson();
+	      Reader reader = new InputStreamReader(response.getContent());
+	      APIDocObject model = gson.fromJson(reader, APIDocObject.class);
+	      if(model != null && model.data!=null) {
+	    	  logger.info("API Doc uuid:" + model.data.id);
+		      return model;
+	      }
+	      return null;
+	      
+    } catch (HttpResponseException e) {
+    	throw e;
+    }
+  }
+  
+  /**
+   * Import an API Doc
+   */
+  public static void updateAPIDoc(ServerProfile profile, File file, APIDocResponseObject doc) throws IOException {
+    try {
+	      SpecObject spec = parseSpec(profile, file);  
+	      
+	      logger.info("Update API Doc..");
+	      byte[] fileBytes = Files.readAllBytes(file.toPath());
+		  ByteArrayContent fileContent = new ByteArrayContent("application/octet-stream", fileBytes);
+		  HttpRequest restRequest = REQUEST_FACTORY
+	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc/"+doc.data.get(0).id+"/spec"), fileContent);
+		  HttpHeaders headers = restRequest.getHeaders();
+		  headers.setAccept("application/vnd.api+json");
+		  headers.set("Content-Disposition", "file; filename=\""+spec.getTitle()+"."+profile.getPortalFormat()+"\"");
+	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+	      restRequest.setReadTimeout(0);
+	      HttpResponse response = restRequest.execute();
+		  logger.info("Update API Doc complete..");
+    } catch (HttpResponseException e) {
+    	throw e;
+    }
+  }
+  
+  /**
+   * Create an API Doc
+   */
+  public static String createAPIDoc(ServerProfile profile, File file, APIDocObject doc) throws IOException {
+    HttpResponse response = null;
+    try {
+	      SpecObject spec = parseSpec(profile, file);  
+	      
+	      logger.info("Creating spec.." + doc.data.id);
+	      ByteArrayContent content = getAPIDocContent(profile, spec, doc.data.id);
+	      HttpRequest restRequest = REQUEST_FACTORY
+	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc"), content);
+	      HttpHeaders headers = restRequest.getHeaders();
+	      headers.setAccept("application/vnd.api+json");
+	      headers.setContentType("application/vnd.api+json");
+	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+	      restRequest.setReadTimeout(0);
+	      response = restRequest.execute();
+	      Gson gson = new Gson();
+	      Reader reader = new InputStreamReader(response.getContent());
+	      APIDocObject model = gson.fromJson(reader, APIDocObject.class);
+	      logger.info("API Doc:  " + spec.getTitle()+ " created");
+	      if(model != null && model.data!=null) {
+	    	  logger.info("API Doc uuid:" + model.data.id);
+		      return model.data.id;
+	      }
+	      return null;
+	      
+    } catch (HttpResponseException e) {
+    	throw e;
+    }
+  }
+  
+  /**
+   * Delete an API Doc
+   */
+  public static void deleteAPIDoc(ServerProfile profile, File file) throws IOException {
+	  try {
+		  APIDocResponseObject respObj = getAPIDoc(profile, file);
+	      if (respObj != null) {
+		      logger.info("Delete API Doc..");
+			  HttpRequest restRequest = REQUEST_FACTORY
+		              .buildDeleteRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc/"+respObj.data.get(0).id));
+			  HttpHeaders headers = restRequest.getHeaders();
+			  headers.setAccept("application/vnd.api+json");
+		      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+		      restRequest.setReadTimeout(0);
+		      HttpResponse response = restRequest.execute();
+			  logger.info("Delete API Doc complete..");
+	      }
+    } catch (HttpResponseException e) {
+    	throw e;
+    }
+  }
+
 
   /**
    * Helper function to parse a json formatted OpenAPI spec and turn it into an
