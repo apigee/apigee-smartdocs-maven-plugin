@@ -5,9 +5,31 @@
 - If you are using Drupal 7 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal7)
 - To utilize this example, you will need a working developer portal instance with the [API Docs](https://www.drupal.org/docs/8/modules/apigee-api-catalog/expose-rest-apis-to-interact-with-api-docs#s-prerequisites) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin.**
 
+------------
+Plugin Usage
+------------
+```
+mvn install -Pdev -Dapigee.smartdocs.config.options=create
+
+  # Options
+
+  -P<profile>
+    Pick a profile in the parent pom.xml (shared-pom.xml in the example).
+    Apigee org and env information comes from the profile.
+
+  -Dapigee.smartdocs.config.options
+    none   - No action (default)
+    create - Creates the doc found in the OpenAPI Spec directory
+    update - Updates the doc found in the OpenAPI Spec directory
+    delete - Deletes the doc found in the OpenAPI Spec directory
+    sync   - executes delete and update options mentioned above
+    
+```
+
+
 ## DevPortal
 
-### Basic Implementation (Model import)
+### Basic Implementation
 
 **Please ensure all prerequisites have been followed prior to continuing.**
 

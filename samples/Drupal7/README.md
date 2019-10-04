@@ -10,6 +10,31 @@ When the module has been installed in the codebase, go to http://[yoursite.com]/
 
 When smartdocs_service module is installed and enabled, you should see 1 available service labeled smartdocs_service on the page located at http://[yoursite.com]/admin/structure/services.
 
+------------
+Plugin Usage
+------------
+```
+mvn install -Pdev -Dapigee.smartdocs.config.options=create
+
+  # Options
+
+  -P<profile>
+    Pick a profile in the parent pom.xml (shared-pom.xml in the example).
+    Apigee org and env information comes from the profile.
+
+  -Dapigee.smartdocs.config.options
+    none   - No action (default)
+    create - Creates the model found in the OpenAPI Spec directory
+    update - Updates the model found in the OpenAPI Spec directory
+    delete - Deletes all models not found in the OpenAPI Spec directory
+    deleteAPIModel - Deletes all models from dev portal found in the OpenAPI Spec directory (available on v1.0.4 or later)
+    render - Renders the smart docs 
+    sync   - executes the delete option (mentioned above) and recreates the models found in the OpenAPI Spec directory. This also renders the smart docs as well
+    
+   If you use create or update option, you will need to run the command again with option as render
+```
+
+
 ### Service Listing
 ![](images/Service-Listing.png)
 
