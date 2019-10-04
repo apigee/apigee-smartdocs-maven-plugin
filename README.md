@@ -11,7 +11,7 @@ The code is distributed under the Apache License 2.0.
 TL;DR
 ------------
 
-- Version **1.x** of this plugin should be used for **Drupal 7** version of the Developer portal. For example in your pom.xml
+- Version **1.x** of this plugin should be used for **Drupal 7** version of the Developer portal and the goal is `apimodel`. For example in your pom.xml
   ```xml
     <plugin>
         <groupId>com.apigee.smartdocs.config</groupId>
@@ -22,13 +22,13 @@ TL;DR
                 <id>smartdocs-deploy</id>
                 <phase>install</phase>
                 <goals>
-                    <goal>apidoc</goal>
+                    <goal>apimodel</goal>
                 </goals>
             </execution>
         </executions>
     </plugin>
   ```
-- Version **2.x** of this plugin should be used for **Drupal 8** version of the Developer portal. For example in your pom.xml
+- Version **2.x** of this plugin should be used for **Drupal 8** version of the Developer portal and the goal is `apidoc`. For example in your pom.xml
 ```xml
     <plugin>
         <groupId>com.apigee.smartdocs.config</groupId>
