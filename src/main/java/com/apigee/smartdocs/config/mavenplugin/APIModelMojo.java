@@ -165,10 +165,10 @@ public class APIModelMojo extends GatewayAbstractMojo {
       }
 
       if (buildOption == OPTIONS.sync) {
-        doUpdate();
+    	doDelete();
+    	doUpdate();
         addFieldData();
         doRender();
-        doDelete();
       }
 
     } catch (MojoFailureException e) {
