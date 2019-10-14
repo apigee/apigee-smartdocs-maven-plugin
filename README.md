@@ -4,7 +4,7 @@
 About the Plugin
 ----------------
 
-apigee-smatdocs-maven-plugin is a utility for creating API models and pushing an OpenAPI spec document into the API Catalog module for a Drupal 8-based developer portal, where it can then be rendered into documentation using SmartDocs or another renderer.
+apigee-smartdocs-maven-plugin is a utility for creating API models and pushing an OpenAPI spec document into the API Catalog module for a Drupal 8-based developer portal, where it can then be rendered into documentation using SmartDocs or another renderer.
 
 The code is distributed under the Apache License 2.0.
 
