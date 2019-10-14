@@ -25,7 +25,7 @@ mvn install -Pdev -Dapigee.smartdocs.config.options=create
 ## Prerequisites (Developer Portal setup)
 - This sample is for **Drupal 8 version of Developer portal**. The version of the plugin used in the pom **should be 2.x**
 - If you are using Drupal 7 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal7)
-- To utilize this example, you will need a working developer portal instance with the [API Docs](https://www.drupal.org/docs/8/modules/apigee-api-catalog/expose-rest-apis-to-interact-with-api-docs#s-prerequisites) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin.**
+- To utilize this example, you will need a working developer portal instance with the [API Docs](https://www.drupal.org/docs/8/modules/apigee-api-catalog/expose-rest-apis-to-interact-with-api-docs#s-prerequisites) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin.
 
 ## DevPortal
 
