@@ -50,6 +50,9 @@ To use, edit samples/DevPortal/pom.xml and update portal values as specified.
       <portal.api.doc.format>basic_html</portal.api.doc.format><!-- Format in the portal. Values: basic_html, restricted_html, full_html -->
       <portal.directory>${pdirectory}</portal.directory><!-- Directory where OpenAPI specs are accessible. -->
 
+*NOTE*
+Please provide the url of the developer portal without the trailing "/" 
+
 To run, jump to the sample project `cd /samples/DevPortal` and run 
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create`
