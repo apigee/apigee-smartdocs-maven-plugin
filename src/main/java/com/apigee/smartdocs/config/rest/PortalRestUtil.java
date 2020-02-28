@@ -799,7 +799,6 @@ public class PortalRestUtil {
 	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc"), content);
 	      HttpHeaders headers = restRequest.getHeaders();
 	      headers.setAccept("application/vnd.api+json");
-	      headers.setContentType("application/vnd.api+json");
 	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
 	      restRequest.setReadTimeout(0);
 	      response = restRequest.execute();
