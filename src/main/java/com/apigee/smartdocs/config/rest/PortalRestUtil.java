@@ -48,6 +48,7 @@ import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpMediaType;
+import com.google.api.client.http.HttpMethods;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -55,6 +56,7 @@ import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.MultipartContent;
+import com.google.api.client.http.apache.ApacheHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson.JacksonFactory;
@@ -72,6 +74,7 @@ import com.google.gson.reflect.TypeToken;
 public class PortalRestUtil {
 
   static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
+  static final HttpTransport APACHE_HTTP_TRANSPORT = new ApacheHttpTransport();
   static final JsonFactory JSON_FACTORY = new JacksonFactory();
   static String versionRevision;
   static Logger logger = LoggerFactory.getLogger(PortalRestUtil.class);
@@ -88,6 +91,19 @@ public class PortalRestUtil {
               HttpsURLConnection.setDefaultHostnameVerifier(_hostnameVerifier);
             }
           });
+ 
+  static HttpRequestFactory APACHE_REQUEST_FACTORY = APACHE_HTTP_TRANSPORT
+          .createRequestFactory(new HttpRequestInitializer() {
+            // @Override
+            public void initialize(HttpRequest request) {
+              request.setParser(JSON_FACTORY.createJsonObjectParser());
+              XTrustProvider.install();
+              FakeHostnameVerifier _hostnameVerifier = new FakeHostnameVerifier();
+              // Install the all-trusting host name verifier:
+              HttpsURLConnection.setDefaultHostnameVerifier(_hostnameVerifier);
+            }
+          });
+
 
   // Header values to ensure headers are set and then stored.
   public static Boolean headersSet = false;
@@ -230,9 +246,20 @@ public class PortalRestUtil {
 	    public Object links;
 }
   
+  public static class APIErrorObject {
+	  public JSONAPI jsonapi;
+	  public List<Error> errors;
+  }
+  
   public static class JSONAPI {
 	  public String version;
 	  public Object meta;
+  }
+  
+  public static class Error{
+	  public String title;
+	  public String status;
+	  public String detail;
   }
   
   public static class Data {
@@ -568,7 +595,7 @@ public class PortalRestUtil {
   /**
    * Helper function to build the body for API Doc creations and updates.
    */
-  private static ByteArrayContent getAPIDocContent(ServerProfile profile, SpecObject spec, String uuid) throws IOException {
+  private static ByteArrayContent getAPIDocContent(ServerProfile profile, SpecObject spec, String uuid, boolean isUpdate) throws IOException {
 	  Gson gson = new Gson();
 	  JsonObject body = new JsonObject();
 	  if (spec.getDescription() != null) {
@@ -576,7 +603,7 @@ public class PortalRestUtil {
 	  }
 	  body.addProperty("format", profile.getPortalAPIDocFormat());
 
-	  JsonObject attributes = new JsonObject(); 
+	  JsonObject attributes = new JsonObject();
 	  attributes.addProperty("status", true);
 	  attributes.addProperty("title", spec.getTitle());
 	  attributes.add("body", body);
@@ -608,8 +635,11 @@ public class PortalRestUtil {
 
 	  JsonObject data = new JsonObject();
 	  data.addProperty("type", "node--apidoc");
+	  if(isUpdate)
+		  data.addProperty("id", uuid); //set this only for update call
 	  data.add("attributes", attributes);
-	  data.add("relationships", relationships);
+	  if(!isUpdate)
+		  data.add("relationships", relationships); //not needed for update
 	  
 	  JsonObject payloadData = new JsonObject();
 	  payloadData.add("data", data);
@@ -620,7 +650,7 @@ public class PortalRestUtil {
 	  ByteArrayContent content = new ByteArrayContent("application/vnd.api+json", payload.getBytes());
 	  return content; 
   }
-
+ 
   /**
    * Posts the OpenAPI Spec to a APIModel in Developer Portal.
    */
@@ -787,6 +817,16 @@ public class PortalRestUtil {
     try {
 	      SpecObject spec = parseSpec(profile, file);  
 	      
+	      logger.info("Update API catalog");
+	      ByteArrayContent content = getAPIDocContent(profile, spec, doc.data.get(0).id, true);
+	      HttpRequest restPatchRequest = APACHE_REQUEST_FACTORY.buildRequest(HttpMethods.PATCH, new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/"+doc.data.get(0).id),
+					content);
+	      HttpHeaders patchHeaders = restPatchRequest.getHeaders();
+	      patchHeaders.setAccept("application/vnd.api+json");
+	      patchHeaders.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+	      restPatchRequest.setReadTimeout(0);
+	      restPatchRequest.execute();
+	      
 	      logger.info("Update API Doc..");
 	      byte[] fileBytes = Files.readAllBytes(file.toPath());
 		  ByteArrayContent fileContent = new ByteArrayContent("application/octet-stream", fileBytes);
@@ -797,10 +837,10 @@ public class PortalRestUtil {
 		  headers.set("Content-Disposition", "file; filename=\""+spec.getTitle()+"."+profile.getPortalFormat()+"\"");
 	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
 	      restRequest.setReadTimeout(0);
-	      HttpResponse response = restRequest.execute();
+	      restRequest.execute();
 		  logger.info("Update API Doc complete..");
     } catch (HttpResponseException e) {
-    	throw e;
+    	throw new IOException(exceptionHandler(e));
     }
   }
   
@@ -813,7 +853,7 @@ public class PortalRestUtil {
 	      SpecObject spec = parseSpec(profile, file);  
 	      
 	      logger.info("Creating spec.." + doc.data.id);
-	      ByteArrayContent content = getAPIDocContent(profile, spec, doc.data.id);
+	      ByteArrayContent content = getAPIDocContent(profile, spec, doc.data.id, false);
 	      HttpRequest restRequest = REQUEST_FACTORY
 	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc"), content);
 	      HttpHeaders headers = restRequest.getHeaders();
@@ -832,7 +872,7 @@ public class PortalRestUtil {
 	      return null;
 	      
     } catch (HttpResponseException e) {
-    	throw e;
+    	throw new IOException(exceptionHandler(e));
     }
   }
   
@@ -854,7 +894,7 @@ public class PortalRestUtil {
 			  logger.info("Delete API Doc complete..");
 	      }
     } catch (HttpResponseException e) {
-    	throw e;
+    	throw new IOException(exceptionHandler(e));
     }
   }
 
@@ -1004,6 +1044,18 @@ public class PortalRestUtil {
       throw e;
     }
     return response;
+  }
+  
+  public static String exceptionHandler(HttpResponseException hre) {
+	  Gson gson = new Gson();
+	  APIErrorObject errorObj = gson.fromJson(hre.getContent(), APIErrorObject.class);
+	  if(errorObj!=null && errorObj.errors!=null && errorObj.errors.size()>0){
+		  String errorMsg = "\nStatus code: "+ errorObj.errors.get(0).status +"\n";
+		  errorMsg = errorMsg + "Status Message: " + errorObj.errors.get(0).title +"\n";
+		  errorMsg = errorMsg + "Detailed Message: " + errorObj.errors.get(0).detail +"\n";
+		  return errorMsg;
+	  }
+	  return "";
   }
 
 }
