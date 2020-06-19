@@ -70,6 +70,7 @@ If you want to configure and manage fields, you can create a json file and pass 
 }
 ```
 NOTE: The fields should be pre-configured in the portal.
+
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create -Dapigee.smartdocs.config.file=./config.json`
 
 
