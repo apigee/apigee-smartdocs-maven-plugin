@@ -206,7 +206,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.4</version>
+        <version>3.5</version>
         <configuration>
           <goalPrefix>apigee-smartdocs</goalPrefix>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
@@ -218,12 +218,12 @@
               <goal>descriptor</goal>
             </goals>
           </execution>
-          <execution>
+          <!--  <execution>
             <id>help-goal</id>
             <goals>
               <goal>helpmojo</goal>
             </goals>
-          </execution>
+          </execution> -->
         </executions>
       </plugin>
     </plugins>
