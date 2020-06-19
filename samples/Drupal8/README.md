@@ -26,6 +26,9 @@ mvn install -Pdev -Dapigee.smartdocs.config.options=create
 - This sample is for **Drupal 8 version of Developer portal**. The version of the plugin used in the pom **should be 2.x**
 - If you are using Drupal 7 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal7)
 - To utilize this example, you will need a working developer portal instance with the [API Docs](https://www.drupal.org/docs/8/modules/apigee-api-catalog/expose-rest-apis-to-interact-with-api-docs#s-prerequisites) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin.
+- For JSON API 1.x module, use version 2.1 (JSON API 1.x will be deprecated)
+- For JSON API 2.x module, use version 2.2 or later
+
 
 ## DevPortal
 
@@ -55,6 +58,20 @@ To use, edit samples/DevPortal/pom.xml and update portal values as specified.
 To run, jump to the sample project `cd /samples/DevPortal` and run 
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create`
+
+If you want to configure and manage fields, you can create a json file and pass that as `apigee.smartdocs.config.file` argument. A simple example
+```
+{
+ "field_foo": "bar",
+ "field_list:[
+ 		"item1",
+ 		"item2"
+ 	]
+}
+```
+NOTE: The fields should be pre-configured in the portal.
+`mvn install -Pdev -Dapigee.smartdocs.config.options=create -Dapigee.smartdocs.config.file=./config.json`
+
 
 ### Troubleshooting
 

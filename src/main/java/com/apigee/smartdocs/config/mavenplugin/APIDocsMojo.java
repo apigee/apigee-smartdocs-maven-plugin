@@ -83,6 +83,10 @@ public class APIDocsMojo extends GatewayAbstractMojo {
         throw new MojoExecutionException(
           "Developer portal URL not found in profile");
       }
+      if (serverProfile.getPortalURL() != null && serverProfile.getPortalURL().endsWith("/")) {
+          throw new MojoExecutionException(
+            "Please provide the url of the developer portal without the trailing \"/\"");
+        }
       if (serverProfile.getPortalUserName() == null) {
         throw new MojoExecutionException(
           "Developer portal username not found in profile");

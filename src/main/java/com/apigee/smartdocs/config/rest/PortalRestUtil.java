@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import com.apigee.smartdocs.config.utils.ServerProfile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.GenericUrl;
@@ -244,21 +245,21 @@ public class PortalRestUtil {
   
   public static class Attributes {
 	  public boolean status;
-	  public String name;
-	  public Description description;
-	  public String spec_file_source;
+	  public String title;
+	  public Body body;
+	  public String field_apidoc_spec_file_source;
 	  public Object relationships;
 	  public FileLink file_link;
 	  public Object links;
   }
   
-  public static class Description{
+  public static class Body{
 	  public String value;
 	  public String format;
   }
   
   public static class Relationships{
-	  public Relationships_Spec spec;
+	  public Relationships_Spec field_apidoc_spec;
   }
   
   public static class Relationships_Data{
@@ -568,38 +569,56 @@ public class PortalRestUtil {
    * Helper function to build the body for API Doc creations and updates.
    */
   private static ByteArrayContent getAPIDocContent(ServerProfile profile, SpecObject spec, String uuid) throws IOException {
-	  APIDocObject doc = new APIDocObject();
-	  Data data = new Data();
-	  Attributes attributes = new Attributes();
-	  Description description = new Description();
-	  Relationships relationships = new Relationships();
-	  Relationships_Data relationships_data = new Relationships_Data();
-	  Relationships_Spec relationships_spec = new Relationships_Spec();
-	  data.type = "apidoc--apidoc";
-
-	  attributes.status = true;
-	  attributes.name = spec.getTitle();
-	  if (spec.getDescription() != null) {
-		  description.value = StringEscapeUtils.escapeJava(spec.getDescription());
-	  }
-	  description.format = profile.getPortalAPIDocFormat();
-	  attributes.description = description; 
-	  attributes.spec_file_source = "file";
-	  data.attributes = attributes;
-
-	  relationships_data.id = uuid;
-	  relationships_data.type = "file--file";
-	  relationships_spec.data = relationships_data;
-	  relationships.spec = relationships_spec;
-	  data.relationships = relationships;
-	  
-	  doc.data = data;
-	  
 	  Gson gson = new Gson();
-	  String payload = gson.toJson(doc);
+	  JsonObject body = new JsonObject();
+	  if (spec.getDescription() != null) {
+		  body.addProperty("value", StringEscapeUtils.escapeJava(spec.getDescription()));
+	  }
+	  body.addProperty("format", profile.getPortalAPIDocFormat());
+
+	  JsonObject attributes = new JsonObject(); 
+	  attributes.addProperty("status", true);
+	  attributes.addProperty("title", spec.getTitle());
+	  attributes.add("body", body);
+	  attributes.addProperty("field_apidoc_spec_file_source", "file");
+	  
+	  //config
+	  if(profile.getConfigFile()!=null && !profile.getConfigFile().equalsIgnoreCase("")) {
+		  FileContent tempFileContent = new FileContent("application/json", new File(profile.getConfigFile()).getAbsoluteFile());
+	      Reader reader = new InputStreamReader(tempFileContent.getInputStream());
+		  Map<String, Object> result = new ObjectMapper().readValue(reader, HashMap.class);
+		  if(result!=null && result.size()>0) {
+			  for (String key : result.keySet()) {
+				  if(result.get(key) instanceof List){
+					  attributes.add(key, gson.toJsonTree(result.get(key)));
+				  }else
+					  attributes.addProperty(key, (String)result.get(key));
+			}
+		  }
+	  }	 
+	  JsonObject field_apidoc_spec_data = new JsonObject();
+	  field_apidoc_spec_data.addProperty("type", "file--file");
+	  field_apidoc_spec_data.addProperty("id", uuid);
+
+	  JsonObject field_apidoc_spec = new JsonObject();
+	  field_apidoc_spec.add("data", field_apidoc_spec_data);
+
+	  JsonObject relationships = new JsonObject();
+	  relationships.add("field_apidoc_spec", field_apidoc_spec);
+
+	  JsonObject data = new JsonObject();
+	  data.addProperty("type", "node--apidoc");
+	  data.add("attributes", attributes);
+	  data.add("relationships", relationships);
+	  
+	  JsonObject payloadData = new JsonObject();
+	  payloadData.add("data", data);
+	  
+	  String payload = gson.toJson(payloadData);
+	  
 	  logger.debug("Request payload: \n" + payload);
 	  ByteArrayContent content = new ByteArrayContent("application/vnd.api+json", payload.getBytes());
-	  return content;
+	  return content; 
   }
 
   /**
@@ -672,7 +691,7 @@ public class PortalRestUtil {
       throw e;
     }
   }
-  
+    
   /**
    * Posts the OpenAPI Spec to a APIDoc in Developer Portal.
    */
@@ -704,7 +723,7 @@ public class PortalRestUtil {
 	      SpecObject spec = parseSpec(profile, file);  
 	      logger.info("Getting API doc for "+ spec.getTitle());
 	      HttpRequest restRequest = REQUEST_FACTORY
-	              .buildGetRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc?filter[name]=" + spec.getTitle()));
+	              .buildGetRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc?filter[title]=" + spec.getTitle()));
 	      HttpHeaders headers = restRequest.getHeaders();
 	      headers.setAccept("application/vnd.api+json");
 	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
@@ -739,7 +758,7 @@ public class PortalRestUtil {
 	      byte[] fileBytes = Files.readAllBytes(file.toPath());
 		  ByteArrayContent fileContent = new ByteArrayContent("application/octet-stream", fileBytes);
 		  HttpRequest restRequest = REQUEST_FACTORY
-	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc/spec"), fileContent);
+	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/field_apidoc_spec"), fileContent);
 		  HttpHeaders headers = restRequest.getHeaders();
 		  headers.setAccept("application/vnd.api+json");
 		  headers.set("Content-Disposition", "file; filename=\""+spec.getTitle()+"."+profile.getPortalFormat()+"\"");
@@ -772,7 +791,7 @@ public class PortalRestUtil {
 	      byte[] fileBytes = Files.readAllBytes(file.toPath());
 		  ByteArrayContent fileContent = new ByteArrayContent("application/octet-stream", fileBytes);
 		  HttpRequest restRequest = REQUEST_FACTORY
-	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc/"+doc.data.get(0).id+"/spec"), fileContent);
+	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/"+doc.data.get(0).id+"/field_apidoc_spec"), fileContent);
 		  HttpHeaders headers = restRequest.getHeaders();
 		  headers.setAccept("application/vnd.api+json");
 		  headers.set("Content-Disposition", "file; filename=\""+spec.getTitle()+"."+profile.getPortalFormat()+"\"");
@@ -796,7 +815,7 @@ public class PortalRestUtil {
 	      logger.info("Creating spec.." + doc.data.id);
 	      ByteArrayContent content = getAPIDocContent(profile, spec, doc.data.id);
 	      HttpRequest restRequest = REQUEST_FACTORY
-	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc"), content);
+	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc"), content);
 	      HttpHeaders headers = restRequest.getHeaders();
 	      headers.setAccept("application/vnd.api+json");
 	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
@@ -826,7 +845,7 @@ public class PortalRestUtil {
 	      if (respObj != null) {
 		      logger.info("Delete API Doc..");
 			  HttpRequest restRequest = REQUEST_FACTORY
-		              .buildDeleteRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/apidoc/apidoc/"+respObj.data.get(0).id));
+		              .buildDeleteRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/"+respObj.data.get(0).id));
 			  HttpHeaders headers = restRequest.getHeaders();
 			  headers.setAccept("application/vnd.api+json");
 		      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
