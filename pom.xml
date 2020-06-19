@@ -24,12 +24,6 @@
 
   <developers>
     <developer>
-      <name>WILLIAM O'CONNOR</name>
-      <email>bill@achieveinternet.com</email>
-      <organization>Achieve Internet</organization>
-      <organizationUrl>http://www.apigee.com</organizationUrl>
-    </developer>
-    <developer>
       <name>Sai Saran Vaidyanathan</name>
       <email>ssvaidyanathan@google.com</email>
       <organization>Google</organization>
@@ -44,6 +38,8 @@
   </scm>
 
   <properties>
+  	<maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.version>4.3.20.RELEASE</spring.version>
     <log4j.version>1.2.17</log4j.version>
@@ -182,6 +178,11 @@
   	<artifactId>commons-text</artifactId>
   	<version>1.2</version>
   </dependency>
+  <dependency> 
+  	<groupId>com.fasterxml.jackson.core</groupId>
+  	<artifactId>jackson-databind</artifactId>
+  	<version>2.4.4</version>
+  </dependency> 
   </dependencies>
 
   <build>

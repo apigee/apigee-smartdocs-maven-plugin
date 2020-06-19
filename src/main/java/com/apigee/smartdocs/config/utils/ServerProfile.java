@@ -21,7 +21,8 @@ import java.util.Map;
 public class ServerProfile {
 
   private String options;
-
+  private String configFile;
+  
   // Portal Parameters
   private String portalUserName; // Developer Portal Username
   private String portalPassword; // Developer Portal Password
@@ -161,6 +162,17 @@ public class ServerProfile {
     this.portalModelFields = portalModelFields;
   }
 
+  /**
+   * @param configFile the options to set
+   */
+  public String getConfigFile() {
+    return configFile;
+  }
+
+  public void setConfigFile(String configFile) {
+    this.configFile = configFile;
+  }
+  
   /**
    * @param options the options to set
    */

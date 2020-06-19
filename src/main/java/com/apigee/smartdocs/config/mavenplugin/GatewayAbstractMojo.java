@@ -81,11 +81,11 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
   private String options;
 
   /**
-   * Config dir
+   * Config File
    *
-   * @parameter property="apigee.smartdocs.config.dir"
+   * @parameter property="apigee.smartdocs.config.file"
    */
-  private String configDir;
+  private String configFile;
 
   /**
    * Portal User Name
@@ -180,6 +180,7 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
   public ServerProfile getProfile() {
     this.buildProfile = new ServerProfile();
     this.buildProfile.setOptions(this.options);
+    this.buildProfile.setConfigFile(this.configFile);
     this.buildProfile.setPortalUserName(this.portalUserName);
     this.buildProfile.setPortalPassword(this.portalPassword);
     this.buildProfile.setPortalDirectory(this.portalDirectory);
@@ -221,9 +222,17 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
   public String getOptions() {
     return options;
   }
-
+  
   public void setOptions(String options) {
     this.options = options;
+  }
+
+  public void setConfigFile(String configFile) {
+    this.configFile = configFile;
+  }
+  
+  public String getConfigFile() {
+    return configFile;
   }
 
   /**
