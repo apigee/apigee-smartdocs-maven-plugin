@@ -59,17 +59,37 @@ To run, jump to the sample project `cd /samples/DevPortal` and run
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create`
 
-If you want to configure and manage fields, you can create a json file and pass that as `apigee.smartdocs.config.file` argument. A simple example
+If you want to configure/manage fields and taxonomy, you can create a json file and pass that as `apigee.smartdocs.config.file` argument. A simple example below:
 ```
 {
- "field_foo": "bar",
- "field_list:[
- 		"item1",
- 		"item2"
- 	]
+   "fields":{
+      "field_foo": "bar",
+      "field_list":[
+         "item1",
+         "item2"
+      ]
+   },
+   "taxonomy_terms":[
+      {
+         "vocabulary":"capability",
+         "field":"field_capability",
+         "data":[
+            "Capability1",
+            "Capability2"
+         ]
+      },
+      {
+         "vocabulary":"api_category",
+         "field":"field_api_category",
+         "data":[
+            "Mobile"
+         ]
+      }
+   ]
 }
 ```
-NOTE: The fields should be pre-configured in the portal.
+
+NOTE: The fields and taxonomy should be pre-configured in the portal. Please provide the correct the field, vocabulary names.
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create -Dapigee.smartdocs.config.file=./apicatalog-config.json`
 
