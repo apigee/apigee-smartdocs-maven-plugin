@@ -16,13 +16,13 @@
     <profile>
         <id>dev</id>
         <properties>
-        	<portal.url>https://api-cat-2x-sai-demo.pantheonsite.io</portal.url><!-- URL of the developer portal. -->
-            <portal.username>api_user</portal.username><!-- Username for the developer portal. -->
-            <portal.password>n5M4z*ZBvK5v</portal.password><!-- Password for the developer portal. -->
-            <portal.format>yaml</portal.format><!-- Format of the OpenAPI specs. json|yaml -->
-            <portal.api.doc.format>basic_html</portal.api.doc.format><!-- Format in the portal. Values: basic_html, restricted_html, full_html -->
-            <portal.directory>./specs</portal.directory> <!-- Directory where OpenAPI specs are accessible. Using ./specs for sample -->
-            <apigee.smartdocs.config.file>./apicatalog-config.json</apigee.smartdocs.config.file> <!-- Config for fields -->
+        	<portal.url>${purl}</portal.url><!-- URL of the developer portal. -->
+        	<portal.username>${pusername}</portal.username><!-- Username for the developer portal. -->
+        	<portal.password>${ppassword}</portal.password><!-- Password for the developer portal. -->
+        	<portal.format>yaml</portal.format><!-- Format of the OpenAPI specs. json|yaml -->
+        	<portal.api.doc.format>basic_html</portal.api.doc.format><!-- Format in the portal. Values: basic_html, restricted_html, full_html -->
+        	<portal.directory>./specs</portal.directory> <!-- Directory where OpenAPI specs are accessible. Using ./specs for sample -->
+        	<apigee.smartdocs.config.file>./apicatalog-config.json</apigee.smartdocs.config.file> <!-- Config for fields -->
         </properties>
     </profile>
 </profiles>
