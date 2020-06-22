@@ -29,6 +29,12 @@
       <organization>Google</organization>
       <organizationUrl>www.google.com</organizationUrl>
     </developer>
+    <developer>
+      <name>Gitesh Koli</name>
+      <email>gkoli@google.com</email>
+      <organization>Google</organization>
+      <organizationUrl>www.google.com</organizationUrl>
+    </developer>
   </developers>
 
   <scm>
