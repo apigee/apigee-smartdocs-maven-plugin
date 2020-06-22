@@ -381,11 +381,14 @@ public class PortalRestUtil {
 					  if(taxonomyTermsIdMap!=null && taxonomyTermsIdMap.size()>0) {
 						  JsonArray taxonomyData = new JsonArray();
 						  for (String key : taxonomyTermsIdMap.keySet()) {
-							  for (String id : taxonomyTermsIdMap.get(key)) {
-								  JsonObject taxonomyId = new JsonObject();
-								  taxonomyId.addProperty("type", "taxonomy_term--"+(String)map.get("vocabulary"));
-								  taxonomyId.addProperty("id", id);
-								  taxonomyData.add(taxonomyId);
+							  List<String> list = taxonomyTermsIdMap.get(key);
+							  if(list!=null && list.size()>0) {
+								  for (String id : taxonomyTermsIdMap.get(key)) {
+									  JsonObject taxonomyId = new JsonObject();
+									  taxonomyId.addProperty("type", "taxonomy_term--"+(String)map.get("vocabulary"));
+									  taxonomyId.addProperty("id", id);
+									  taxonomyData.add(taxonomyId);
+								  }
 							  }
 							  JsonObject taxonomyDataObj = new JsonObject();
 							  taxonomyDataObj.add("data", taxonomyData);
@@ -427,7 +430,7 @@ public class PortalRestUtil {
   /**
    * Posts the OpenAPI Spec to a APIDoc in Developer Portal.
    */
-  public static void postAPIDoc(ServerProfile profile, File file) throws IOException {
+  public static void postAPIDoc(ServerProfile profile, File file, boolean isCreate) throws IOException {
     try {
       APIDocResponseObject respObj = getAPIDoc(profile, file);
       if (respObj == null) {
@@ -437,6 +440,10 @@ public class PortalRestUtil {
     	  else
     		  createAPIDoc(profile, file, obj);
       } else {
+    	  if(isCreate) {
+    		  logger.info("Skipping as the spec already exist. Please use \"sync\" or \"update\" options");
+    		  return;
+    	  }
         updateAPIDoc(profile, file, respObj);
       }
     } catch (HttpResponseException e) {
@@ -471,18 +478,23 @@ public class PortalRestUtil {
 		      Reader reader = new InputStreamReader(response.getContent());
 		      APIDocResponseObject model = gson.fromJson(reader, APIDocResponseObject.class);
 		      List<String> idList = new ArrayList<String>();
+		      List<String> termList = new ArrayList<String>();
 		      for (Data data : model.data) {
+		    	  termList.add(data.attributes.name);
 		    	  if(dataList.contains(data.attributes.name)) {
 		    		  idList.add(data.id);
 		    	  }
 		      }
-		      if(idList!=null && idList.size()>0)
-		    	  taxonomyTermIdMap.put(field, idList);
+		      dataList.removeAll(termList);
+		      //Throw exception if the taxonomy terms from the config file does not exist
+		      if(dataList!=null && dataList.size()>0) {
+		    	  throw new IOException("Terms "+ dataList +" does not exist");
+		      }
+		    taxonomyTermIdMap.put(field, idList);
 		  }
 	  }catch (HttpResponseException e) {
 		  throw new IOException(e.getStatusMessage());
 	    }
-	  
 	  return taxonomyTermIdMap;
   }
   
@@ -542,7 +554,7 @@ public class PortalRestUtil {
 	      Reader reader = new InputStreamReader(response.getContent());
 	      APIDocObject model = gson.fromJson(reader, APIDocObject.class);
 	      if(model != null && model.data!=null) {
-	    	  logger.info("API Doc uuid:" + model.data.id);
+	    	  logger.info("File uuid:" + model.data.id);
 		      return model;
 	      }
 	      return null;
