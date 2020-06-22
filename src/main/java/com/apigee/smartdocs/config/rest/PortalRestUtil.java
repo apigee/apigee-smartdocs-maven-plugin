@@ -560,7 +560,7 @@ public class PortalRestUtil {
 	      return null;
 	      
     } catch (HttpResponseException e) {
-    	throw e;
+    	throw new IOException(exceptionHandler(e));
     }
   }
   
