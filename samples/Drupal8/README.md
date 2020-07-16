@@ -65,11 +65,11 @@ To run, jump to the sample project `cd /samples/DevPortal` and run
 
 If you want to configure/manage fields and taxonomy, you can create a json file and pass that as `apigee.smartdocs.config.file` argument. A simple example below:
 
-**NOTE: The fields should be pre-configured on the API Doc content type in the portal
+**NOTE: The fields should be pre-configured on the API Doc content type in the portal**
 
 #### Sample
 
-![](./media/screensho1.png)
+![](./media/screenshot1.png)
 
 Types of fields supported :
  - Text (single or multivalued textfields or dropdowns)
@@ -77,7 +77,7 @@ Types of fields supported :
 
 To use Taxonomy reference fields make sure that you are using a term already defined in the Vocabulary. In the config file, we will need to specify the vocabulary name for every taxonomy field that is being used. Additionally we have to ensure that the JSONAPIs for the related taxonomy terms are enabled.
 
-![](./media/screensho1.png)
+![](./media/screenshot2.png)
 
 For example, The default Categories field on API Doc is associated with the “API Category” Vocabulary and has Data Append, Identity, Mobile, Payments , etc as acceptable term values.
 
@@ -86,8 +86,8 @@ Here is a  sample metadata file (apicatalog-config.json) :
 ```
 {
    "fields":{
-      "field_foo": "bar",
-      "field_list":[
+      "field_business_unit": "ABC",
+      "field_multi_value":[
          "item1",
          "item2"
       ]
@@ -110,6 +110,7 @@ Here is a  sample metadata file (apicatalog-config.json) :
       }
    ]
 }
+
 ```
 
 NOTE: The fields and taxonomy should be pre-configured in the portal. Please provide the correct the field, vocabulary names.
