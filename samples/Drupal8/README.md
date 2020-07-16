@@ -92,7 +92,7 @@ To use Taxonomy reference fields make sure that you are using a term already def
 
 ![](./media/screenshot2.png)
 
-For example, The default Categories field on API Doc is associated with the “API Category” Vocabulary and has Data Append, Identity, Mobile, Payments , etc as acceptable term values.
+For example, the default Categories field on API Doc is associated with the "API Category" Vocabulary and has Data Append, Identity, Mobile, Payments , etc as acceptable term values.
 
 Here is a  sample metadata file (apicatalog-config.json) : 
 
@@ -126,7 +126,7 @@ Here is a  sample metadata file (apicatalog-config.json) :
 
 ```
 
-NOTE: The fields and taxonomy should be pre-configured in the portal. Please provide the correct the field, vocabulary names.
+NOTE: The fields and taxonomy should be pre-configured in the portal. Please provide the correct field, vocabulary names.
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create -Dapigee.smartdocs.config.file=./apicatalog-config.json`
 
