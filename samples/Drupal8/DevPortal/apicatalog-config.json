@@ -1,8 +1,27 @@
 {
-	"field_business_unit": "Petstore",
-	"field_drop_down": "one",
-	"field_multi_value": [
-		"value1",
-		"value2"
-	]
+   "fields":{
+      "field_business_unit":"Petstore",
+      "field_drop_down":"one",
+      "field_multi_value":[
+         "value1",
+         "value2"
+      ]
+   },
+   "taxonomy_terms":[
+      {
+         "vocabulary":"capability",
+         "field":"field_capability",
+         "data":[
+            "Capability1",
+            "Capability2"
+         ]
+      },
+      {
+         "vocabulary":"api_category",
+         "field":"field_categories",
+         "data":[
+            "Mobile"
+         ]
+      }
+   ]
 }

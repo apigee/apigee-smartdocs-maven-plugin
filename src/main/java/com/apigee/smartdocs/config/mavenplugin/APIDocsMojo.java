@@ -134,9 +134,12 @@ public class APIDocsMojo extends GatewayAbstractMojo {
         return;
       }
       
-      if (buildOption == OPTIONS.create ||
-        buildOption == OPTIONS.update) {
-        doUpdate();
+      if (buildOption == OPTIONS.create){
+        doUpdate(true);
+      }
+      
+      if (buildOption == OPTIONS.update) {
+        doUpdate(false);
       }
       
       if (buildOption == OPTIONS.delete) {
@@ -145,7 +148,7 @@ public class APIDocsMojo extends GatewayAbstractMojo {
 
       if (buildOption == OPTIONS.sync) {
     	  doDelete();
-    	  doUpdate();
+    	  doUpdate(true);
       }
 
     } catch (MojoFailureException e) {
@@ -160,10 +163,10 @@ public class APIDocsMojo extends GatewayAbstractMojo {
    * information, then upload the current OpenAPI spec.
    * @throws MojoExecutionException
    */
-  public void doUpdate() throws MojoExecutionException {
+  public void doUpdate(boolean isCreate) throws MojoExecutionException {
     try {
       for (File file : files) {
-        PortalRestUtil.postAPIDoc(serverProfile, file);
+        PortalRestUtil.postAPIDoc(serverProfile, file, isCreate);
       }
     }
     catch (IOException e) {
