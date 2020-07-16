@@ -26,8 +26,8 @@ mvn install -Pdev -Dapigee.smartdocs.config.options=create
 - This sample is for **Drupal 8 version of Developer portal**. The version of the plugin used in the pom **should be 2.x**
 - If you are using Drupal 7 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal7)
 - To utilize this example, you will need a working developer portal instance with the [API Docs](https://www.drupal.org/docs/8/modules/apigee-api-catalog/expose-rest-apis-to-interact-with-api-docs#s-prerequisites) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin.
-- For API Catalog 1.x module, use version 2.0.1 (API Catalog 1.x will be deprecated)
-- For API Catalog 2.x module, use version 2.1.0 or later
+- For Apigee API Catalog 1.x module, use version 2.0.1 (Apigee API Catalog 1.x will be deprecated)
+- For Apigee API Catalog 2.x module, use version 2.1.0 or later
 
 
 ## DevPortal
@@ -59,7 +59,30 @@ To run, jump to the sample project `cd /samples/DevPortal` and run
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create`
 
+### Advanced Implementation
+
+**To use these features make sure you have the Apigee API Catalog module version 8.x-2.2 or higher.  Please read through the [release notes](https://www.drupal.org/project/apigee_api_catalog/releases/8.x-2.2).** 
+
 If you want to configure/manage fields and taxonomy, you can create a json file and pass that as `apigee.smartdocs.config.file` argument. A simple example below:
+
+**NOTE: The fields should be pre-configured on the API Doc content type in the portal
+
+#### Sample
+
+![](./media/screensho1.png)
+
+Types of fields supported :
+ - Text (single or multivalued textfields or dropdowns)
+ - Entity Reference (Taxonomy)
+
+To use Taxonomy reference fields make sure that you are using a term already defined in the Vocabulary. In the config file, we will need to specify the vocabulary name for every taxonomy field that is being used. Additionally we have to ensure that the JSONAPIs for the related taxonomy terms are enabled.
+
+![](./media/screensho1.png)
+
+For example, The default Categories field on API Doc is associated with the “API Category” Vocabulary and has Data Append, Identity, Mobile, Payments , etc as acceptable term values.
+
+Here is a  sample metadata file (apicatalog-config.json) : 
+
 ```
 {
    "fields":{
