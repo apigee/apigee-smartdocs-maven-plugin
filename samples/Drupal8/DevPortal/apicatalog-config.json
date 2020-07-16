@@ -18,7 +18,7 @@
       },
       {
          "vocabulary":"api_category",
-         "field":"field_api_category",
+         "field":"field_categories",
          "data":[
             "Mobile"
          ]
