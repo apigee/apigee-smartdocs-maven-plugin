@@ -80,7 +80,7 @@ If you want to configure/manage fields and taxonomy, you can create a json file 
       },
       {
          "vocabulary":"api_category",
-         "field":"field_api_category",
+         "field":"field_categories",
          "data":[
             "Mobile"
          ]
