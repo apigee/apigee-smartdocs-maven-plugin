@@ -27,7 +27,7 @@ mvn install -Pdev -Dapigee.smartdocs.config.options=create
 - If you are using Drupal 7 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal7)
 - To utilize this example, you will need a working developer portal instance with the [API Docs](https://www.drupal.org/docs/8/modules/apigee-api-catalog/expose-rest-apis-to-interact-with-api-docs#s-prerequisites) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin.
 - For JSON API 1.x module, use version 2.0.1 (JSON API 1.x will be deprecated)
-- For JSON API 2.x module, use version 2.1 or later
+- For JSON API 2.x module, use version 2.1.0 or later
 
 
 ## DevPortal
