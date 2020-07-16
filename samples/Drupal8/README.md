@@ -72,7 +72,7 @@ To run, jump to the sample project `cd /samples/DevPortal` and run
 
 `mvn install -Pdev -Dapigee.smartdocs.config.options=create`
 
-### Advanced Implementation
+### Advanced Implementation (available on v2.1.0 or later)
 
 **To use these features make sure you have the Apigee API Catalog module version 8.x-2.2 or higher.  Please read through the [release notes](https://www.drupal.org/project/apigee_api_catalog/releases/8.x-2.2).** 
 
