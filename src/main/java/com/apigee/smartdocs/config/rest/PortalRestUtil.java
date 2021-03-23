@@ -361,7 +361,7 @@ public class PortalRestUtil {
 		  FileContent tempFileContent = new FileContent("application/json", new File(profile.getConfigFile()).getAbsoluteFile());
 	      Reader reader = new InputStreamReader(tempFileContent.getInputStream());
 		  Map<String, Object> result = new ObjectMapper().readValue(reader, HashMap.class);
-		  if(result!=null && result.size()>0 && result.get("fields")!=null) {
+		  if(result!=null && result.size()>0) {
 			  //For Custom Fields
 			  Map<String, Object> fieldsMap = (Map<String, Object>) result.get("fields");
 			  if(fieldsMap!=null && fieldsMap.size()>0) {
