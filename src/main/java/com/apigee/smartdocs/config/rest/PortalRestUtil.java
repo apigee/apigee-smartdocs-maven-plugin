@@ -358,7 +358,7 @@ public class PortalRestUtil {
 	  
 	  //config
 	  Map<String, Object> result = loadApiConfigFile(profile);
-	  if(result!=null && result.size()>0 && result.get("fields")!=null) {
+	  if(result!=null && result.size()>0) {
 		  //For Custom Fields
 		  Map<String, Object> fieldsMap = (Map<String, Object>) result.get("fields");
 		  if(fieldsMap!=null && fieldsMap.size()>0) {
