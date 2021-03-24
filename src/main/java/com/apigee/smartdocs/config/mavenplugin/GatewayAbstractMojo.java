@@ -88,6 +88,13 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
   private String configFile;
 
   /**
+   * Config File
+   *
+   * @parameter property="portal.api.id.field"
+   */
+  private String apiIdField;
+
+  /**
    * Portal User Name
    *
    * @parameter property="portal.username"
@@ -181,6 +188,7 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
     this.buildProfile = new ServerProfile();
     this.buildProfile.setOptions(this.options);
     this.buildProfile.setConfigFile(this.configFile);
+    this.buildProfile.setApiIdField(this.apiIdField);
     this.buildProfile.setPortalUserName(this.portalUserName);
     this.buildProfile.setPortalPassword(this.portalPassword);
     this.buildProfile.setPortalDirectory(this.portalDirectory);
