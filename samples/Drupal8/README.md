@@ -96,7 +96,7 @@ For example, the default Categories field on API Doc is associated with the "API
 
 Here is a  sample metadata file (apicatalog-config.json) : 
 
-** NOTE: Support for API spec image is available from v2.1.2. Make sure the image is in the same folder as the spec and include the name of the file in the config file (see below) **
+**NOTE: Support for API spec image is available from v2.1.2. Make sure the image is in the same folder as the spec and include the name of the file in the config file (see below)**
 
 ```
 {
