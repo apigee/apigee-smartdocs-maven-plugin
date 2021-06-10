@@ -203,6 +203,12 @@ public class PortalRestUtil {
 	    public Object links;
 }
   
+  public static class ImageDocObject {
+	    public JSONAPI jsonapi;
+	    public Data data;
+	    public Object links;
+}
+  
   public static class APIErrorObject {
 	  public JSONAPI jsonapi;
 	  public List<Error> errors;
@@ -245,6 +251,7 @@ public class PortalRestUtil {
   
   public static class Relationships{
 	  public Relationships_Spec field_apidoc_spec;
+	  public Relationships_Spec field_image;
   }
   
   public static class Relationships_Data{
@@ -320,7 +327,6 @@ public class PortalRestUtil {
    * Run Cron
    */
   public static void runCron(ServerProfile profile) throws IOException {
-    HttpResponse response = null;
     try {
       // First authenticate.
       authenticate(profile);
@@ -330,7 +336,7 @@ public class PortalRestUtil {
       restRequest.setReadTimeout(0);
       logger.info("Running Cron");
 
-      response = PortalRestUtil.executeRequest(restRequest);
+      PortalRestUtil.executeRequest(restRequest);
     } catch (HttpResponseException e) {
       throw e;
     }
@@ -340,7 +346,9 @@ public class PortalRestUtil {
   /**
    * Helper function to build the body for API Doc creations and updates.
    */
-  private static ByteArrayContent getAPIDocContent(ServerProfile profile, SpecObject spec, String uuid, String docId, boolean isUpdate) throws IOException {
+  private static ByteArrayContent constructAPIDocRequestBody(ServerProfile profile, SpecObject spec, String uuid, String docId, String imageId, boolean isUpdate) throws IOException {
+	  boolean hasImage = false;
+	  File imageFile = null;
 	  Gson gson = new Gson();
 	  JsonObject body = new JsonObject();
 	  if (spec.getDescription() != null) {
@@ -368,8 +376,14 @@ public class PortalRestUtil {
 				  for (String key : fieldsMap.keySet()) {
 					  if(fieldsMap.get(key) instanceof List){
 						  attributes.add(key, gson.toJsonTree(fieldsMap.get(key)));
-					  }else
-						  attributes.addProperty(key, (String)fieldsMap.get(key));
+					  }
+					  //no need to add to attributes for "field_image"
+					  else if (key!=null && key.equals("field_image")){
+						  hasImage = true; 
+						  imageFile = new File(profile.getPortalDirectory()+"/"+(String)fieldsMap.get(key));
+					  }
+					  else
+						  attributes.addProperty(key, (String)fieldsMap.get(key)); 
 				  }
 			  }
 			  
@@ -407,8 +421,26 @@ public class PortalRestUtil {
 		  field_apidoc_spec_data.addProperty("id", docId);
 	  JsonObject field_apidoc_spec = new JsonObject();
 	  field_apidoc_spec.add("data", field_apidoc_spec_data);
-
+	  
 	  relationships.add("field_apidoc_spec", field_apidoc_spec);
+	  
+	  //field_image
+	  if(hasImage) {
+		  JsonObject field_image_data = new JsonObject();
+		  field_image_data.addProperty("type", "media--image");
+		  if(!isUpdate) {
+			  ImageDocObject imageDoc = importImage(profile, imageFile);
+			  String mediaImageId = importMediaImage(profile, imageFile.getName(), imageDoc.data.id);
+			  field_image_data.addProperty("id", mediaImageId);
+		  }
+		  else {
+			  field_image_data.addProperty("id", imageId);
+		  }
+		  JsonObject field_image = new JsonObject();
+		  field_image.add("data", field_image_data);
+	
+		  relationships.add("field_image", field_image);
+	  }
 
 	  JsonObject data = new JsonObject();
 	  data.addProperty("type", "node--apidoc");
@@ -565,6 +597,84 @@ public class PortalRestUtil {
   }
   
   /**
+   * Import an image
+   */
+  public static ImageDocObject importImage(ServerProfile profile, File imageFile) throws IOException {
+    HttpResponse response = null;
+    try {	      
+	      logger.info("Importing image..");
+	      byte[] fileBytes = Files.readAllBytes(imageFile.toPath());
+		  ByteArrayContent fileContent = new ByteArrayContent("application/octet-stream", fileBytes);
+		  HttpRequest restRequest = REQUEST_FACTORY
+	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/media/image/field_media_image"), fileContent);
+		  HttpHeaders headers = restRequest.getHeaders();
+		  headers.setAccept("application/vnd.api+json");
+		  headers.set("Content-Disposition", "file; filename=\""+imageFile.getName()+"\"");
+	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+	      restRequest.setReadTimeout(0);
+	      response = restRequest.execute();
+		  logger.info("Image import complete..");
+	      Gson gson = new Gson();
+	      Reader reader = new InputStreamReader(response.getContent());
+	      
+	      ImageDocObject model = gson.fromJson(reader, ImageDocObject.class);
+	      if(model != null && model.data!=null) {
+	    	  logger.info("Image uuid:" + model.data.id);
+		      return model;
+	      }
+	      return null;
+	      
+    } catch (HttpResponseException e) {
+    	throw new IOException(exceptionHandler(e));
+    }
+  }
+  
+  /**
+   * Configure media-image
+   */
+  
+  public static String importMediaImage(ServerProfile profile, String fileName, String imageId) throws IOException {
+	  HttpResponse response = null;
+	  try {
+		    String payload = "{\n"
+				+ "    \"data\": {\n"
+				+ "        \"type\": \"media--image\",\n"
+				+ "        \"attributes\": {\n"
+				+ "            \"name\": \""+fileName+"\"\n"
+				+ "        },\n"
+				+ "        \"relationships\": {\n"
+				+ "            \"field_media_image\": {\n"
+				+ "                \"data\": {\n"
+				+ "                    \"type\": \"file--file\",\n"
+				+ "                    \"id\": \""+imageId+"\"\n"
+				+ "                }\n"
+				+ "            }\n"
+				+ "        }\n"
+				+ "    }\n"
+				+ "}";
+			  ByteArrayContent content = new ByteArrayContent("application/vnd.api+json", payload.getBytes());
+			  HttpRequest restRequest = REQUEST_FACTORY
+			          .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/media/image"), content);
+			  HttpHeaders headers = restRequest.getHeaders();
+			  headers.setAccept("application/vnd.api+json");
+			  headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
+			  restRequest.setReadTimeout(0);
+			  response = restRequest.execute();
+			  Gson gson = new Gson();
+			  Reader reader = new InputStreamReader(response.getContent());
+			  ImageDocObject model = gson.fromJson(reader, ImageDocObject.class);
+			  if(model != null && model.data!=null) {
+				  logger.info("media--image uuid:" + model.data.id);
+			      return model.data.id;
+			  }
+	  	}
+	  catch (HttpResponseException e) {
+	    	throw new IOException(exceptionHandler(e));
+	    }
+	  return null;
+  }
+  
+  /**
    * Import an API Doc
    */
   public static void updateAPIDoc(ServerProfile profile, File file, APIDocResponseObject doc) throws IOException {
@@ -572,7 +682,7 @@ public class PortalRestUtil {
 	      SpecObject spec = parseSpec(profile, file);  
 	      
 	      logger.info("Update API catalog");
-	      ByteArrayContent content = getAPIDocContent(profile, spec, doc.data.get(0).id, doc.data.get(0).relationships.field_apidoc_spec.data.id, true);
+	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, doc.data.get(0).id, doc.data.get(0).relationships.field_apidoc_spec.data.id, doc.data.get(0).relationships.field_image.data.id, true);
 	      HttpRequest restPatchRequest = APACHE_REQUEST_FACTORY.buildRequest(HttpMethods.PATCH, new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/"+doc.data.get(0).id),
 					content);
 	      HttpHeaders patchHeaders = restPatchRequest.getHeaders();
@@ -607,7 +717,7 @@ public class PortalRestUtil {
 	      SpecObject spec = parseSpec(profile, file);  
 	      
 	      logger.info("Creating spec.." + doc.data.id);
-	      ByteArrayContent content = getAPIDocContent(profile, spec, doc.data.id, null, false);
+	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, doc.data.id, null, null, false);
 	      HttpRequest restRequest = REQUEST_FACTORY
 	              .buildPostRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc"), content);
 	      HttpHeaders headers = restRequest.getHeaders();
