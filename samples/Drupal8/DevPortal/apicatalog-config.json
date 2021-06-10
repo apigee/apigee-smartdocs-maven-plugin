@@ -1,6 +1,6 @@
 {
    "fields":{
-   	  "field_image": "pets.jpeg",
+   	  "field_image": "pets.png",
    	  "field_business_unit":"Petstore",
       "field_drop_down":"one",
       "field_multi_value":[
