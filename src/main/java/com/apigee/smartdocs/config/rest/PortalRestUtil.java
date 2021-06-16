@@ -382,7 +382,7 @@ public class PortalRestUtil {
 						  String image  = (String)fieldsMap.get(key);
 						  if(image!=null && !image.equals("")) {
 							  hasImage = true; 
-							  imageFile = new File(profile.getPortalDirectory()+"/"+(String)fieldsMap.get(key));
+							  imageFile = new File(profile.getPortalDirectory()+"/"+image);
 						  }
 					  }
 					  else
