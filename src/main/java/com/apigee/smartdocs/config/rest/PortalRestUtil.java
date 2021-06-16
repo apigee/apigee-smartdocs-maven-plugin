@@ -379,8 +379,11 @@ public class PortalRestUtil {
 					  }
 					  //no need to add to attributes for "field_image"
 					  else if (key!=null && key.equals("field_image")){
-						  hasImage = true; 
-						  imageFile = new File(profile.getPortalDirectory()+"/"+(String)fieldsMap.get(key));
+						  String image  = (String)fieldsMap.get(key);
+						  if(image!=null && !image.equals("")) {
+							  hasImage = true; 
+							  imageFile = new File(profile.getPortalDirectory()+"/"+(String)fieldsMap.get(key));
+						  }
 					  }
 					  else
 						  attributes.addProperty(key, (String)fieldsMap.get(key)); 
@@ -624,7 +627,8 @@ public class PortalRestUtil {
 	      }
 	      return null;
 	      
-    } catch (HttpResponseException e) {
+    }
+    catch (HttpResponseException e) {
     	throw new IOException(exceptionHandler(e));
     }
   }

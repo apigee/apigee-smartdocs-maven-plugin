@@ -96,7 +96,44 @@ For example, the default Categories field on API Doc is associated with the "API
 
 Here is a  sample metadata file (apicatalog-config.json) : 
 
-**NOTE: Support for API spec image is available from v2.1.2. Make sure the image is in the same folder as the spec and include the name of the file in the config file (see below)**
+```
+{
+   "fields":{
+      "field_business_unit": "ABC",
+      "field_multi_value":[
+         "item1",
+         "item2"
+      ]
+   },
+   "taxonomy_terms":[
+      {
+         "vocabulary":"capability",
+         "field":"field_capability",
+         "data":[
+            "Capability1",
+            "Capability2"
+         ]
+      },
+      {
+         "vocabulary":"api_category",
+         "field":"field_categories",
+         "data":[
+            "Mobile"
+         ]
+      }
+   ]
+}
+
+```
+
+**NOTE: The fields and taxonomy should be pre-configured in the portal. Please provide the correct field, vocabulary names.**
+
+`mvn install -Pdev -Dapigee.smartdocs.config.options=create -Dapigee.smartdocs.config.file=./apicatalog-config.json`
+
+
+### Support for images (from v2.1.3)
+
+Make sure the image is in the **same folder as the spec** and include the name of the file in the config file (see below)
 
 ```
 {
@@ -126,13 +163,12 @@ Here is a  sample metadata file (apicatalog-config.json) :
       }
    ]
 }
-
 ```
 
-NOTE: The fields and taxonomy should be pre-configured in the portal. Please provide the correct field, vocabulary names.
-
-`mvn install -Pdev -Dapigee.smartdocs.config.options=create -Dapigee.smartdocs.config.file=./apicatalog-config.json`
-
+The plugin supports the following with images:
+- Create an API with image
+- Update the spec without updating the image. If you want to update the image, please use the `sync` option
+- Updating the image or deleting an image alone is not possible. Please use the `sync` option
 
 ### Troubleshooting
 
