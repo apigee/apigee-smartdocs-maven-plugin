@@ -22,7 +22,7 @@ public class ServerProfile {
 
   private String options;
   private String configFile;
-  
+    
   // Portal Parameters
   private String portalUserName; // Developer Portal Username
   private String portalPassword; // Developer Portal Password
@@ -33,6 +33,7 @@ public class ServerProfile {
   private String portalModelVocabulary; // Model Vocabulary
   private String portalCronKey; // Dev portal Cron Key
   private String portalModelNameConfig; // OPTIONAL configuration for Model Name
+  private String apiIdField; // OPTIONAL configuration for the API Identification field
   private String portalAPIDocFormat; // Dev Portal API Doc Format
   private Map<String, PortalField> portalModelFields; // OpenAPI spec format
 
@@ -171,6 +172,17 @@ public class ServerProfile {
 
   public void setConfigFile(String configFile) {
     this.configFile = configFile;
+  }
+
+  /**
+   * @param configuration for the API Identification field
+   */
+  public String getApiIdField() {
+    return apiIdField;
+  }
+
+  public void setApiIdField(String apiIdField) {
+    this.apiIdField = apiIdField;
   }
   
   /**

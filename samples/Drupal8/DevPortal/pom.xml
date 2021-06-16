@@ -23,6 +23,7 @@
         	<portal.api.doc.format>basic_html</portal.api.doc.format><!-- Format in the portal. Values: basic_html, restricted_html, full_html -->
         	<portal.directory>./specs</portal.directory> <!-- Directory where OpenAPI specs are accessible. Using ./specs for sample -->
         	<apigee.smartdocs.config.file>./apicatalog-config.json</apigee.smartdocs.config.file> <!-- Config for fields -->
+        	<portal.api.id.field>title</portal.api.id.field>
         </properties>
     </profile>
 </profiles>

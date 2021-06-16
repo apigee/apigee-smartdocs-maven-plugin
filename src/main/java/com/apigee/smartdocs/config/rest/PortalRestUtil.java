@@ -365,50 +365,46 @@ public class PortalRestUtil {
 	  JsonObject relationships = new JsonObject();
 	  
 	  //config
-	  if(profile.getConfigFile()!=null && !profile.getConfigFile().equalsIgnoreCase("")) {
-		  FileContent tempFileContent = new FileContent("application/json", new File(profile.getConfigFile()).getAbsoluteFile());
-	      Reader reader = new InputStreamReader(tempFileContent.getInputStream());
-		  Map<String, Object> result = new ObjectMapper().readValue(reader, HashMap.class);
-		  if(result!=null && result.size()>0) {
-			  //For Custom Fields
-			  Map<String, Object> fieldsMap = (Map<String, Object>) result.get("fields");
-			  if(fieldsMap!=null && fieldsMap.size()>0) {
-				  for (String key : fieldsMap.keySet()) {
-					  if(fieldsMap.get(key) instanceof List){
-						  attributes.add(key, gson.toJsonTree(fieldsMap.get(key)));
-					  }
-					  //no need to add to attributes for "field_image"
-					  else if (key!=null && key.equals("field_image")){
-						  hasImage = true; 
-						  imageFile = new File(profile.getPortalDirectory()+"/"+(String)fieldsMap.get(key));
-					  }
-					  else
-						  attributes.addProperty(key, (String)fieldsMap.get(key)); 
+	  Map<String, Object> result = loadApiConfigFile(profile);
+	  if(result!=null && result.size()>0) {
+		  //For Custom Fields
+		  Map<String, Object> fieldsMap = (Map<String, Object>) result.get("fields");
+		  if(fieldsMap!=null && fieldsMap.size()>0) {
+			  for (String key : fieldsMap.keySet()) {
+				  if(fieldsMap.get(key) instanceof List){
+					  attributes.add(key, gson.toJsonTree(fieldsMap.get(key)));
 				  }
+				  //no need to add to attributes for "field_image"
+				  else if (key!=null && key.equals("field_image")){
+					  hasImage = true; 
+					  imageFile = new File(profile.getPortalDirectory()+"/"+(String)fieldsMap.get(key));
+				  }
+				  else
+					  attributes.addProperty(key, (String)fieldsMap.get(key));
 			  }
-			  
-			  //For Custom taxonomy_terms
-			  List<Map<String, Object>> taxonomyTerm = (List<Map<String, Object>>) result.get("taxonomy_terms");
-			  if(taxonomyTerm!=null && taxonomyTerm.size()>0) {
-				  for (Map<String, Object> map : taxonomyTerm) {
-					  Map<String, List<String>> taxonomyTermsIdMap = getTaxonomyTermId(profile, map);
-					  if(taxonomyTermsIdMap!=null && taxonomyTermsIdMap.size()>0) {
-						  JsonArray taxonomyData = new JsonArray();
-						  for (String key : taxonomyTermsIdMap.keySet()) {
-							  List<String> list = taxonomyTermsIdMap.get(key);
-							  if(list!=null && list.size()>0) {
-								  for (String id : taxonomyTermsIdMap.get(key)) {
-									  JsonObject taxonomyId = new JsonObject();
-									  taxonomyId.addProperty("type", "taxonomy_term--"+(String)map.get("vocabulary"));
-									  taxonomyId.addProperty("id", id);
-									  taxonomyData.add(taxonomyId);
-								  }
+		  }
+		  
+		  //For Custom taxonomy_terms
+		  List<Map<String, Object>> taxonomyTerm = (List<Map<String, Object>>) result.get("taxonomy_terms");
+		  if(taxonomyTerm!=null && taxonomyTerm.size()>0) {
+			  for (Map<String, Object> map : taxonomyTerm) {
+				  Map<String, List<String>> taxonomyTermsIdMap = getTaxonomyTermId(profile, map);
+				  if(taxonomyTermsIdMap!=null && taxonomyTermsIdMap.size()>0) {
+					  JsonArray taxonomyData = new JsonArray();
+					  for (String key : taxonomyTermsIdMap.keySet()) {
+						  List<String> list = taxonomyTermsIdMap.get(key);
+						  if(list!=null && list.size()>0) {
+							  for (String id : taxonomyTermsIdMap.get(key)) {
+								  JsonObject taxonomyId = new JsonObject();
+								  taxonomyId.addProperty("type", "taxonomy_term--"+(String)map.get("vocabulary"));
+								  taxonomyId.addProperty("id", id);
+								  taxonomyData.add(taxonomyId);
 							  }
-							  JsonObject taxonomyDataObj = new JsonObject();
-							  taxonomyDataObj.add("data", taxonomyData);
-							  relationships.add(key, taxonomyDataObj);
-						}
-					  }
+						  }
+						  JsonObject taxonomyDataObj = new JsonObject();
+						  taxonomyDataObj.add("data", taxonomyData);
+						  relationships.add(key, taxonomyDataObj);
+					}
 				  }
 			  }
 		  }
@@ -457,6 +453,16 @@ public class PortalRestUtil {
 	  logger.debug("Request payload: \n" + payload);
 	  ByteArrayContent content = new ByteArrayContent("application/vnd.api+json", payload.getBytes());
 	  return content; 
+  }
+  
+  public static Map<String, Object> loadApiConfigFile(ServerProfile profile) throws IOException {
+	  Map<String, Object> result = null;
+	  if(profile.getConfigFile()!=null && !profile.getConfigFile().equalsIgnoreCase("")) {
+		  FileContent tempFileContent = new FileContent("application/json", new File(profile.getConfigFile()).getAbsoluteFile());
+	      Reader reader = new InputStreamReader(tempFileContent.getInputStream());
+		  result = new ObjectMapper().readValue(reader, HashMap.class);
+	  }
+	  return result;
   }
       
   /**
@@ -536,14 +542,32 @@ public class PortalRestUtil {
   public static APIDocResponseObject getAPIDoc(ServerProfile profile, File file) throws IOException {
     HttpResponse response = null;
     try {
-	      SpecObject spec = parseSpec(profile, file);  
-	      logger.info("Getting API doc for "+ spec.getTitle());
+    	String apiIdField = profile.getApiIdField();
+	    String apiIdValue = null;
+		if (apiIdField != null && !apiIdField.equals("title")) {
+		      Map<String, Object> result = loadApiConfigFile(profile);
+		      if(result!=null && result.size()>0 && result.get("fields")!=null) {
+			      Map<String, Object> fieldsMap = (Map<String, Object>) result.get("fields");
+			      if(fieldsMap!=null && fieldsMap.get(apiIdField) != null) {
+			    	  apiIdValue = (String)fieldsMap.get(apiIdField);
+			      }else {
+			    	  throw new IllegalArgumentException("Identification field " + apiIdField + " not provided");
+			      }
+		      }
+	      }else {
+	    	  SpecObject spec = parseSpec(profile, file);
+	    	  apiIdField = "title";
+	    	  apiIdValue = spec.getTitle();
+	      }
+	  		  
+	      
+	      logger.info("Getting API doc for "+ apiIdValue);
 	      HttpRequest restRequest = REQUEST_FACTORY
-	              .buildGetRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc?filter[title]=" + spec.getTitle()));
+	              .buildGetRequest(new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc?filter[" + apiIdField + "]=" + apiIdValue));
 	      HttpHeaders headers = restRequest.getHeaders();
 	      headers.setAccept("application/vnd.api+json");
 	      headers.setBasicAuthentication(profile.getPortalUserName(), profile.getPortalPassword());
-	      logger.info("Retrieving " + spec.getTitle() + " doc.");
+	      logger.info("Retrieving " + apiIdValue + " doc.");
 	      restRequest.setReadTimeout(0);
 	      response = restRequest.execute();
 	      Gson gson = new Gson();
@@ -553,7 +577,7 @@ public class PortalRestUtil {
 	    	  logger.info("API Doc uuid:" + model.data.get(0).id);
 		      return model;
 	      } else {
-	    	  logger.info("API Doc: "+ spec.getTitle()+" does not exist");
+	    	  logger.info("API Doc: "+ apiIdValue+" does not exist");
 	    	  return null;
 	      }
 	      
@@ -682,7 +706,8 @@ public class PortalRestUtil {
 	      SpecObject spec = parseSpec(profile, file);  
 	      
 	      logger.info("Update API catalog");
-	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, doc.data.get(0).id, doc.data.get(0).relationships.field_apidoc_spec.data.id, doc.data.get(0).relationships.field_image.data.id, true);
+	      String imageId = doc.data.get(0).relationships.field_image.data != null ? doc.data.get(0).relationships.field_image.data.id : null;
+	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, doc.data.get(0).id, doc.data.get(0).relationships.field_apidoc_spec.data.id, imageId, true);
 	      HttpRequest restPatchRequest = APACHE_REQUEST_FACTORY.buildRequest(HttpMethods.PATCH, new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/"+doc.data.get(0).id),
 					content);
 	      HttpHeaders patchHeaders = restPatchRequest.getHeaders();
