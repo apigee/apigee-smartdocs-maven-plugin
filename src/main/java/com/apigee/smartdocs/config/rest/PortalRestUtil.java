@@ -542,10 +542,9 @@ public class PortalRestUtil {
   public static APIDocResponseObject getAPIDoc(ServerProfile profile, File file) throws IOException {
     HttpResponse response = null;
     try {
-    	  String apiIdField = null;
-	      String apiIdValue = null;
-	      if (profile.getApiIdField() != null) {
-		      apiIdField = profile.getApiIdField();
+    	String apiIdField = profile.getApiIdField();
+	    String apiIdValue = null;
+		if (apiIdField != null && !apiIdField.equals("title")) {
 		      Map<String, Object> result = loadApiConfigFile(profile);
 		      if(result!=null && result.size()>0 && result.get("fields")!=null) {
 			      Map<String, Object> fieldsMap = (Map<String, Object>) result.get("fields");
@@ -707,7 +706,8 @@ public class PortalRestUtil {
 	      SpecObject spec = parseSpec(profile, file);  
 	      
 	      logger.info("Update API catalog");
-	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, doc.data.get(0).id, doc.data.get(0).relationships.field_apidoc_spec.data.id, doc.data.get(0).relationships.field_image.data.id, true);
+	      String imageId = doc.data.get(0).relationships.field_image.data != null ? doc.data.get(0).relationships.field_image.data.id : null;
+	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, doc.data.get(0).id, doc.data.get(0).relationships.field_apidoc_spec.data.id, imageId, true);
 	      HttpRequest restPatchRequest = APACHE_REQUEST_FACTORY.buildRequest(HttpMethods.PATCH, new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/"+doc.data.get(0).id),
 					content);
 	      HttpHeaders patchHeaders = restPatchRequest.getHeaders();
