@@ -17,6 +17,7 @@
 package com.apigee.smartdocs.config.mavenplugin;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import com.apigee.smartdocs.config.rest.PortalRestUtil;
 import com.apigee.smartdocs.config.utils.ServerProfile;
-import com.google.api.client.util.Key;
 
 /**                                                                                                                                     ¡¡
  * Goal to create API Docs in Apigee Developer Portal
@@ -37,7 +37,7 @@ import com.google.api.client.util.Key;
  * @phase install
  */
 
-public class APIDocsMojo extends GatewayAbstractMojo {
+public class APIDocsMojo extends PortalAbstractMojo {
   static Logger logger = LoggerFactory.getLogger(APIDocsMojo.class);
   private static File[] files = null;
 
@@ -126,8 +126,6 @@ public class APIDocsMojo extends GatewayAbstractMojo {
       return;
     }
 
-    Logger logger = LoggerFactory.getLogger(APIDocsMojo.class);
-
     try {
       init();
       if (buildOption == OPTIONS.none) {
@@ -205,7 +203,12 @@ public class APIDocsMojo extends GatewayAbstractMojo {
     // Scan the directory for files.
     String directory = serverProfile.getPortalDirectory();
     logger.info("Get OpenAPI Specs from " + directory);
-    files = new File(directory).listFiles();
+    files = new File(directory).listFiles(new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.endsWith(".yaml") || name.endsWith(".yml") || name.endsWith(".json");
+        }
+    });
   }
 }
 

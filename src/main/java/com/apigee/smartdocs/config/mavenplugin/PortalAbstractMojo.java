@@ -22,7 +22,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import com.apigee.smartdocs.config.utils.ServerProfile;
 import com.apigee.smartdocs.config.utils.PortalField;
 
-public abstract class GatewayAbstractMojo extends AbstractMojo {
+public abstract class PortalAbstractMojo extends AbstractMojo {
 
   /**
    * Directory containing the build files.
@@ -180,7 +180,7 @@ public abstract class GatewayAbstractMojo extends AbstractMojo {
 
   public ServerProfile buildProfile;
 
-  public GatewayAbstractMojo() {
+  public PortalAbstractMojo() {
     super();
   }
 
