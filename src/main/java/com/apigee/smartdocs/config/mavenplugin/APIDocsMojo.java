@@ -22,9 +22,8 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import com.apigee.smartdocs.config.rest.PortalRestUtil;
 import com.apigee.smartdocs.config.utils.ServerProfile;
 
@@ -38,7 +37,7 @@ import com.apigee.smartdocs.config.utils.ServerProfile;
  */
 
 public class APIDocsMojo extends PortalAbstractMojo {
-  static Logger logger = LoggerFactory.getLogger(APIDocsMojo.class);
+  static Logger logger = LogManager.getLogger(APIDocsMojo.class);
   private static File[] files = null;
 
   public static final String ____ATTENTION_MARKER____ =
