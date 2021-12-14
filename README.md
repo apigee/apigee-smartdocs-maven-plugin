@@ -7,6 +7,8 @@ About the Plugin
 apigee-smatdocs-maven-plugin is a utility for creating API models and rendering the OpenAPI Specficiation to Smart docs in the Apigee Developer Portal
 The code is distributed under the Apache License 2.0.
 
+**NOTE:** Log4J libraries are upgraded to v2.16.0
+
 ------------
 TL;DR
 ------------

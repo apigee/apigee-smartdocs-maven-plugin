@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.apigee.smartdocs.config.rest.PortalRestUtil;
 import com.apigee.smartdocs.config.utils.PortalField;
@@ -47,7 +47,7 @@ import com.google.gson.internal.LinkedTreeMap;
  */
 
 public class APIModelMojo extends GatewayAbstractMojo {
-  static Logger logger = LoggerFactory.getLogger(APIModelMojo.class);
+  static Logger logger = LogManager.getLogger(APIModelMojo.class);
   private static File[] files = null;
 
   public static final String ____ATTENTION_MARKER____ =
@@ -138,7 +138,7 @@ public class APIModelMojo extends GatewayAbstractMojo {
       return;
     }
 
-    Logger logger = LoggerFactory.getLogger(APIModelMojo.class);
+    Logger logger = LogManager.getLogger(APIModelMojo.class);
 
     try {
       init();
