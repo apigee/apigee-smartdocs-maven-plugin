@@ -33,9 +33,9 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import com.apigee.smartdocs.config.utils.ServerProfile;
@@ -67,7 +67,7 @@ public class PortalRestUtil {
   static final HttpTransport APACHE_HTTP_TRANSPORT = new ApacheHttpTransport();
   static final JsonFactory JSON_FACTORY = new JacksonFactory();
   static String versionRevision;
-  static Logger logger = LoggerFactory.getLogger(PortalRestUtil.class);
+  static Logger logger = LogManager.getLogger(PortalRestUtil.class);
   static String accessToken = null;
 
   static HttpRequestFactory REQUEST_FACTORY = HTTP_TRANSPORT
