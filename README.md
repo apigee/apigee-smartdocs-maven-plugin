@@ -8,7 +8,7 @@ apigee-smartdocs-maven-plugin is a utility for creating API models and pushing a
 
 The code is distributed under the Apache License 2.0.
 
-**NOTE:** Log4J libraries are upgraded to v2.17.0 in v2.2.1
+**NOTE:** Log4J libraries are upgraded to v2.17.1 in v2.2.2
 
 ------------
 TL;DR
