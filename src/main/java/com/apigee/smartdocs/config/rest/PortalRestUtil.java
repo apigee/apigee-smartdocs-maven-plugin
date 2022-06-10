@@ -682,7 +682,10 @@ public class PortalRestUtil {
 	      SpecObject spec = parseSpec(profile, file);  
 	      
 	      logger.info("Update API catalog");
-	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, doc.data.get(0).id, doc.data.get(0).relationships.field_apidoc_spec.data.id, doc.data.get(0).relationships.field_image.data.id, true);
+	      String uuid = (doc.data.get(0).id != null)?doc.data.get(0).id:null;
+	      String docId = (doc.data.get(0).relationships.field_apidoc_spec!=null && doc.data.get(0).relationships.field_apidoc_spec.data!=null && doc.data.get(0).relationships.field_apidoc_spec.data.id!=null)?doc.data.get(0).relationships.field_apidoc_spec.data.id:null;
+	      String imageId = (doc.data.get(0).relationships.field_image!=null && doc.data.get(0).relationships.field_image.data!=null && doc.data.get(0).relationships.field_image.data.id!=null)?doc.data.get(0).relationships.field_image.data.id:null;
+	      ByteArrayContent content = constructAPIDocRequestBody(profile, spec, uuid, docId, imageId, true);
 	      HttpRequest restPatchRequest = APACHE_REQUEST_FACTORY.buildRequest(HttpMethods.PATCH, new GenericUrl(profile.getPortalURL() + "/jsonapi/node/apidoc/"+doc.data.get(0).id),
 					content);
 	      HttpHeaders patchHeaders = restPatchRequest.getHeaders();
