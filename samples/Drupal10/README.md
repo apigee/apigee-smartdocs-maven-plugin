@@ -23,10 +23,10 @@ mvn install -Pdev -Dapigee.smartdocs.config.options=create
 # Samples
 
 ## Prerequisites (Developer Portal setup)
-- This sample is for **Drupal 8 version of Developer portal**. The version of the plugin used in the pom **should be 2.x**
+- This sample is for **Drupal 10 version of Developer portal**. The version of the plugin used in the pom **should be 2.x**
 - If you are using Drupal 7 version of Developer portal, please follow the instructions [here](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples/Drupal7)
 - To utilize this example, you will need a working developer portal instance with the [API Docs](https://www.drupal.org/docs/8/modules/apigee-api-catalog/expose-rest-apis-to-interact-with-api-docs#s-prerequisites) installed and enabled. That module will expose endpoints for use by the SmartDocs Maven Plugin.
-- For Apigee API Catalog 1.x module, use version 2.0.1 (Apigee API Catalog 1.x will be deprecated)
+- For Apigee API Catalog 1.x module, use version 2.0.1 (Apigee API Catalog 1.x which is already deprecated)
 ```xml
 <plugin>
   <groupId>com.apigee.smartdocs.config</groupId>
@@ -74,7 +74,7 @@ To run, jump to the sample project `cd /samples/DevPortal` and run
 
 ### Advanced Implementation (available on v2.1.0 or later)
 
-**To use these features make sure you have the Apigee API Catalog module version 8.x-2.2 or higher.  Please read through the [release notes](https://www.drupal.org/project/apigee_api_catalog/releases/8.x-2.2).** 
+**To use these features make sure you have the Apigee API Catalog module version apigee_api_catalog 3.0.4 or higher.  Please read through the [release notes](https://www.drupal.org/project/apigee_api_catalog/releases/3.0.4).** 
 
 If you want to configure/manage fields and taxonomy, you can create a json file and pass that as `apigee.smartdocs.config.file` argument. A simple example below:
 
@@ -102,6 +102,9 @@ Here is a  sample metadata file (apicatalog-config.json) :
 {
    "fields":{
       "field_image": "pets.jpeg",
+      "field_api_product":[
+         "demo"
+      ],
       "field_business_unit": "ABC",
       "field_multi_value":[
          "item1",

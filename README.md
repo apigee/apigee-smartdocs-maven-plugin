@@ -4,7 +4,7 @@
 About the Plugin
 ----------------
 
-apigee-smartdocs-maven-plugin is a utility for creating API models and pushing an OpenAPI spec document into the API Catalog module for a Drupal 8-based developer portal, where it can then be rendered into documentation using SmartDocs or another renderer.
+apigee-smartdocs-maven-plugin is a utility for creating API models and pushing an OpenAPI spec document into the API Catalog module for a Drupal 10-based developer portal, where it can then be rendered into documentation using SmartDocs or another renderer.
 
 The code is distributed under the Apache License 2.0.
 
@@ -31,7 +31,7 @@ TL;DR
         </executions>
     </plugin>
   ```
-- Version **2.x** of this plugin should be used for **Drupal 8** version of the Developer portal and the goal is `apidoc`. For example in your pom.xml
+- Version **2.x** of this plugin should be used for **Drupal 10** version of the Developer portal and the goal is `apidoc`. For example in your pom.xml
 ```xml
     <plugin>
         <groupId>com.apigee.smartdocs.config</groupId>
@@ -49,7 +49,7 @@ TL;DR
     </plugin>
   ```
 
-The [samples folder](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples) provides a Readme with Getting Started steps and commands to hit the ground quickly. Contains samples for Drupal 7 and Drupal 8 version of Developer portal
+The [samples folder](https://github.com/apigee/apigee-smartdocs-maven-plugin/tree/master/samples) provides a Readme with Getting Started steps and commands to hit the ground quickly. Contains samples for Drupal 7 and Drupal 10 version of Developer portal
 
 
 ## Support

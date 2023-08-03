@@ -348,7 +348,9 @@ public class PortalRestUtil {
    */
   private static ByteArrayContent constructAPIDocRequestBody(ServerProfile profile, SpecObject spec, String uuid, String docId, String imageId, boolean isUpdate) throws IOException {
 	  boolean hasImage = false;
+	  boolean hasAPIProducts = false;
 	  File imageFile = null;
+	  List<String> apiProducts = null;
 	  Gson gson = new Gson();
 	  JsonObject body = new JsonObject();
 	  if (spec.getDescription() != null) {
@@ -374,13 +376,18 @@ public class PortalRestUtil {
 			  Map<String, Object> fieldsMap = (Map<String, Object>) result.get("fields");
 			  if(fieldsMap!=null && fieldsMap.size()>0) {
 				  for (String key : fieldsMap.keySet()) {
-					  if(fieldsMap.get(key) instanceof List){
-						  attributes.add(key, gson.toJsonTree(fieldsMap.get(key)));
+					  if (key!=null && key.equals("field_api_product")){
+						  hasAPIProducts = true; 
+						  apiProducts = new ArrayList<String>();
+						  apiProducts = (List<String>)fieldsMap.get(key);
 					  }
 					  //no need to add to attributes for "field_image"
 					  else if (key!=null && key.equals("field_image")){
 						  hasImage = true; 
 						  imageFile = new File(profile.getPortalDirectory()+"/"+(String)fieldsMap.get(key));
+					  }
+					  else if(fieldsMap.get(key) instanceof List){
+						  attributes.add(key, gson.toJsonTree(fieldsMap.get(key)));
 					  }
 					  else
 						  attributes.addProperty(key, (String)fieldsMap.get(key)); 
@@ -440,6 +447,19 @@ public class PortalRestUtil {
 		  field_image.add("data", field_image_data);
 	
 		  relationships.add("field_image", field_image);
+	  }
+	  //field_api_product
+	  if(hasAPIProducts) {
+		  JsonArray productArray = new JsonArray();
+		  for (int i = 0; i < apiProducts.size(); i++) {
+			  JsonObject product = new JsonObject();
+			  product.addProperty("type", "api_product--api_product");
+			  product.addProperty("id", apiProducts.get(i));
+			  productArray.add(product);
+		}
+		  JsonObject field_api_product = new JsonObject();
+		  field_api_product.add("data", productArray);
+		  relationships.add("field_api_product", field_api_product);
 	  }
 
 	  JsonObject data = new JsonObject();
