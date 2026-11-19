@@ -30,8 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,10 +73,6 @@ public class PortalRestUtil {
             // @Override
             public void initialize(HttpRequest request) {
               request.setParser(JSON_FACTORY.createJsonObjectParser());
-              XTrustProvider.install();
-              FakeHostnameVerifier _hostnameVerifier = new FakeHostnameVerifier();
-              // Install the all-trusting host name verifier:
-              HttpsURLConnection.setDefaultHostnameVerifier(_hostnameVerifier);
             }
           });
  
@@ -87,10 +81,6 @@ public class PortalRestUtil {
             // @Override
             public void initialize(HttpRequest request) {
               request.setParser(JSON_FACTORY.createJsonObjectParser());
-              XTrustProvider.install();
-              FakeHostnameVerifier _hostnameVerifier = new FakeHostnameVerifier();
-              // Install the all-trusting host name verifier:
-              HttpsURLConnection.setDefaultHostnameVerifier(_hostnameVerifier);
             }
           });
 
